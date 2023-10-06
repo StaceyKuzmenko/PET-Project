@@ -82,7 +82,7 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - postgres_database:/var/lib/postgresql/data_1
+      - /opt/compose/db:/var/lib/postgresql/data_1
     healthcheck:
       test: ["CMD", "pg_isready", "-q", "-d", "project_db"]
       interval: 10s
