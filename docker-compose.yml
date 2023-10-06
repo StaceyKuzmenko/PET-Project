@@ -124,6 +124,9 @@ services:
     command: webserver
     volumes:
     - /opt/compose/dags:/opt/airflow/dags
+    - /opt/compose/logs:/opt/airflow/logs
+    - /opt/compose/config:/opt/airflow/config
+    - /opt/compose/plugins:/opt/airflow/plugins
     expose:
       - "8080"
     ports:
