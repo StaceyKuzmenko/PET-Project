@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 from typing import Generator
 
-import psycopg
+import psycopg2
 from airflow.hooks.base import BaseHook
 
 class PgConnect:
@@ -31,11 +31,11 @@ class PgConnect:
             sslmode=self.sslmode)
 
     def client(self):
-        return psycopg.connect(self.url())
+        return psycopg2.connect(self.url())
 
     @contextmanager
     def connection(self) -> Generator[psycopg.Connection, None, None]:
-        conn = psycopg.connect(self.url())
+        conn = psycopg2.connect(self.url())
         try:
             yield conn
             conn.commit()
