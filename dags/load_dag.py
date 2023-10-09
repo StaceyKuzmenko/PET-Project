@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.operators.dummy import DummyOperator
 from airflow.decorators import dag, task
-from pg_connect import ConnectionBuilder
+from pg_connect import ConnectionBuilder, pg
 import os
 
 default_args = {
@@ -29,7 +29,7 @@ def load_dag():
         task_id='print_csv_files',
         application="/scripts/print.py",
         conn_id="pg_connect",
-        python_callable=load_dataset_file_to_vertica,
+        python_callable=pg,
 #        application_args=[
 #            "/user/kirillzhul/data/analytics/"
 #        ]
