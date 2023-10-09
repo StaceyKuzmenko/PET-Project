@@ -10,7 +10,7 @@ password = ''
 #establishing ftp connetion and changing home folder to Engeocom
 ftp = FTP(ftp_host)
 ftp.login(user=username, passwd=password) 
-ftp.cwd('Engeocom\\test')
+ftp.cwd('Engeocom\\test_sales')
 
 #getting the list of filenames 
 filelist = ftp.nlst()
