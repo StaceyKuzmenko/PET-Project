@@ -6,9 +6,6 @@ from airflow.decorators import dag, task
 from lib import ConnectionBuilder
 import os
 
-
-
-
 default_args = {
     "owner": "airflow",
     "start_date": datetime(2023, 10, 9),
@@ -22,22 +19,24 @@ dag = DAG(
     catchup=False,
 )
 
-start_task = DummyOperator(task_id="start")
+def load_dag():
+    # Создаем подключение к базе dwh.
+    pg_connect = ConnectionBuilder.pg_conn("postgres_db_conn")
 
-load_date = SparkSubmitOperator(
-    task_id="load_date",
-    dag=dag,
-    application="/lessons/users_mart.py",
-    conn_id="yarn_spark",
-    application_args=[
-        "2022-05-31",
-        "30",
-        "/user/kirillzhul/data/geo/events/",
-        "/user/kirillzhul/geo_2.csv",
-        "/user/kirillzhul/data/analytics/",
-    ]    
+    start_task = DummyOperator(task_id="start")
+
+    print_csv_files = PythonOperator(
+        task_id='print_csv_files',
+        application="/scripts/print.py",
+        conn_id="pg_connect",
+#        application_args=[
+#            "/user/kirillzhul/data/analytics/"
+#        ]
 )
 
-end_task = DummyOperator(task_id="end")
+    end_task = DummyOperator(task_id="end")
 
-start_task >> load_date >> end_task
+    start_task >> print_csv_files >> end_task
+
+
+_ = load_dag()  
