@@ -39,4 +39,4 @@ def load_dag():
     start_task >> print_csv_files >> end_task
 
 
-_ = load_dag()  
+load_dag = load_dag()  
