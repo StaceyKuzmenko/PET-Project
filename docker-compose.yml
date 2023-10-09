@@ -59,7 +59,7 @@ x-airflow-common:
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
   volumes:
     - /opt/compose/dags:/opt/airflow/dags
-    - /opt/compose/logs:/opt/airflow/logs
+    #- /opt/compose/logs:/opt/airflow/logs
     - /opt/compose/config:/opt/airflow/config
     - /opt/compose/plugins:/opt/airflow/plugins
     #- /opt/compose/airflow.cfg:/opt/airflow/airflow.cfg
@@ -125,7 +125,7 @@ services:
     command: webserver
     volumes:
     - /opt/compose/dags:/opt/airflow/dags
-    - /opt/compose/logs:/opt/airflow/logs
+    #- /opt/compose/logs:/opt/airflow/logs
     - /opt/compose/config:/opt/airflow/config
     - /opt/compose/plugins:/opt/airflow/plugins
     expose:
