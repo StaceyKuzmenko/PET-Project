@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.operators.dummy import DummyOperator
 from airflow.decorators import dag, task
-from lib import ConnectionBuilder
+from lib.pg_connect import ConnectionBuilder
 import os
 
 default_args = {
