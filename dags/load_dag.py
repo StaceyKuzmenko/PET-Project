@@ -29,6 +29,7 @@ def load_dag():
         task_id='print_csv_files',
         application="/scripts/print.py",
         conn_id="pg_connect",
+        python_callable=load_dataset_file_to_vertica,
 #        application_args=[
 #            "/user/kirillzhul/data/analytics/"
 #        ]
