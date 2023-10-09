@@ -4,12 +4,6 @@ from typing import Generator
 import psycopg
 from airflow.hooks.base import BaseHook
 
-host = 95.143.191.48
-port = 5433
-db_name = project_db
-user = project_user
-pw = project_password
-
 class PgConnect:
     def __init__(self, host: str, port: str, db_name: str, user: str, pw: str, sslmode: str = "require") -> None:
         self.host = host
