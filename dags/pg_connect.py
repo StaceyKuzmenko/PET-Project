@@ -34,7 +34,7 @@ class PgConnect:
         return psycopg2.connect(self.url())
 
     @contextmanager
-    def connection(self) -> Generator[psycopg.Connection, None, None]:
+    def connection(self) -> Generator[psycopg2.Connection, None, None]:
         conn = psycopg2.connect(self.url())
         try:
             yield conn
