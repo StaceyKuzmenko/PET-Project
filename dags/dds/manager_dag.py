@@ -12,7 +12,7 @@ default_args = {
 
 def manager_dag():
     # Создаем подключение к базе dwh.
-    dwh_pg_connect = ConnectionBuilder.pg_conn("PG_WAREHOUSE_CONNECTION")
+    dwh_pg_connect = ConnectionBuilder.pg_conn("postgres_db_conn")
 
     start_task = DummyOperator(task_id="start")
    
