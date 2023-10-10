@@ -19,24 +19,31 @@ default_args = {
     "start_date": datetime(2023, 1, 1),
 }
 
+dag = DAG(
+    dag_id="manager_dag",
+    start_date=datetime.datetime(2023, 11, 5),
+    schedule="@daily",
+    catchup=False
+)
+
+start_task = DummyOperator(task_id="start")
+
 def manager_dag():
     # Создаем подключение к базе dwh.
     dwh_pg_connect = connect()
+  
+    @task(task_id="load_managers")
+    def load_managers():
+        managers_loader = ManagerLoader(dwh_pg_connect, log)
+        managers_loader.load_managers()  # Вызываем функцию, которая перельет данные.
+
+    # Инициализируем объявленные tasks.
+    managers_load = load_managers()       
+
+    managers_load
     
-    start_task = DummyOperator(task_id="start")
-   
-#    @task(task_id="load_managers")
-#    def load_managers():
-#        managers_loader = ManagerLoader(dwh_pg_connect, log)
-#        managers_loader.load_managers()  # Вызываем функцию, которая перельет данные.
+end_task = DummyOperator(task_id="end")
 
-#    end_task = DummyOperator(task_id="end")
-
-#   # Инициализируем объявленные tasks.
-#    managers_load = load_managers()       
-
-#    managers_load
-
-start_task
+start_task >> managers_load >> end_task
     
 manager_dag = manager_dag()  
