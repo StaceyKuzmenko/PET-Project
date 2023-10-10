@@ -43,6 +43,6 @@ def manager_dag():
 
     end_task = DummyOperator(task_id="end")
 
-    start_task >> managers_load >> end_task
+start_task >> managers_load >> end_task
 
 manager_dag = manager_dag()
