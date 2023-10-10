@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.empty import EmptyOperator
 from airflow.decorators import dag, task
 from airflow.operators.dummy import DummyOperator
-from dag.dds import ConnectionBuilder
+import ConnectionBuilder
 
 default_args = {
     "owner": "airflow",
