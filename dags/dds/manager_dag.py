@@ -31,6 +31,7 @@ dag = DAG(
 
 
 @task(task_id="load_managers")
+dwh_pg_connect = connect()
 def load_managers():
     managers_loader = ManagerLoader(dwh_pg_connect, log)
     managers_loader.load_managers()  # Вызываем функцию, которая перельет данные.
