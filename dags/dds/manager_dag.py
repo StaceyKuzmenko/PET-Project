@@ -33,18 +33,19 @@ def manager_dag():
 
     start_task = DummyOperator(task_id="start")
 
-#    @task(task_id="load_managers")
-#    def load_managers():
-#        managers_loader = ManagerLoader(dwh_pg_connect, log)
-#        managers_loader.load_managers()  # Вызываем функцию, которая перельет данные.
+    #    @task(task_id="load_managers")
+    #    def load_managers():
+    #        managers_loader = ManagerLoader(dwh_pg_connect, log)
+    #        managers_loader.load_managers()  # Вызываем функцию, которая перельет данные.
 
     # Инициализируем объявленные tasks.
- #   managers_load = load_managers()
+    #   managers_load = load_managers()
 
     end_task = DummyOperator(task_id="end")
 
- #   start_task >> managers_load >> end_task
+    #   start_task >> managers_load >> end_task
 
-     start_task >> end_task
+    start_task >> end_task
+
 
 manager_dag = manager_dag()
