@@ -1,15 +1,13 @@
+import logging
 from logging import Logger
 from typing import List
-import json
 from typing import List, Optional
-from examples.dds.dds_settings_repository import EtlSetting, DdsEtlSettingsRepository
 from lib import PgConnect
-from lib.dict_util import json2str
 from psycopg import Connection
 from psycopg.rows import class_row
 from pydantic import BaseModel
 from datetime import datetime
-import logging
+
 
 log = logging.getLogger(__name__)
 
@@ -19,19 +17,28 @@ class ClientRawObj(BaseModel):
     sales_channel: varchar
     region: varchar
 
+
+class ManagerRawObj(BaseModel):
+    manager_id: int
+    manager: varchar
+
+
+class ManagerDdsObj(BaseModel):
+    manager: varchar
+
+
 class ClientDdsObj(BaseModel):
-    id: int
     id_manager: int # это поле берем из dds.managers
     client_id: varchar
     client: varchar 
-	  sales_channel: varchar
-	  region: varchar 
+    sales_channel: varchar
+    region: varchar
+
+
 
 class ClientRawRepository:
-#    def load_raw_client(self, conn: Connection, last_loaded_record_id: int) -> List[CourierJsonObj]:
-#        with conn.cursor(row_factory=class_row(CourierJsonObj)) as cur:
-    def load_raw_client(self, conn: Connection, last_loaded_record_id: int) -> List[ClientObj]:
-    with conn.cursor(row_factory=class_row(ClientObj)) as cur:
+    def load_raw_client(self, conn: Connection) -> List[ClientRawObj]:
+    with conn.cursor(row_factory=class_row(ClientRawObj)) as cur:
             cur.execute(
                 """
                     SELECT
@@ -39,14 +46,14 @@ class ClientRawRepository:
                         client,
                         sales_channel,
                         region
-                    FROM stg.couriers
+                    FROM stg.new_sales
                 """,
                 )
             objs = cur.fetchall()
         return objs
 
-class ClientDestRepository:
 
+class ClientDdsRepository:
     def insert_client(self, conn: Connection, client: ClientDdsObj) -> None:
         with conn.cursor() as cur:
             cur.execute(
@@ -57,10 +64,55 @@ class ClientDestRepository:
                 """,
                 {
                     "client_id": clients.client_id,
-                    "client": client.client,
-                    "sales_channel": client.sales_channel,
-                    "region": client.region 
+                    "client": clients.client,
+                    "sales_channel": clients.sales_channel,
+                    "region": clients.region 
                 },
             )
 
+
+class ManagerRawRepository:
+    def load_raw_manager(self, conn: Connection) -> List[ManagerRawObj]:
+    with conn.cursor(row_factory=class_row(ManagerRawObj)) as cur:
+            cur.execute(
+                """
+                    SELECT
+                        manager
+                    FROM stg.new_sales
+                """,
+                )
+            objs = cur.fetchall()
+        return objs
+
+
+
+class ManagerDdsRepository:
+    def insert_manager(self, conn: Connection, manager: ManagerDdsObj) -> None:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                    INSERT INTO dds.clients(manager)
+                    VALUES (%(manager)s)
+                    
+                """,
+                {
+                    "manager": clients.manager,
+               },
+            )
+
+
+class ClientLoader:
+    def __init__(self, pg_conn: PgConnect, log: Logger) -> None:
+        self.conn = pg_conn
+        self.dds = CourierDestRepository()
+        self.raw = CourierRawRepository()        
+        self.log = log
+
+
+class ManagerLoader:
+    def __init__(self, pg_conn: PgConnect, log: Logger) -> None:
+        self.conn = pg_conn
+        self.dds = ManagerDestRepository()
+        self.raw = ManagerRawRepository()        
+        self.log = log
 
