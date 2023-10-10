@@ -1,6 +1,5 @@
 import logging
 from logging import Logger
-from typing import List
 from typing import List, Optional
 from lib import PgConnect
 from psycopg import Connection
@@ -11,9 +10,18 @@ from datetime import datetime
 
 log = logging.getLogger(__name__)
 
+
 class ClientRawObj(BaseModel):
     client_id: varchar
     client: varchar
+    sales_channel: varchar
+    region: varchar
+
+
+class ClientDdsObj(BaseModel):
+    id_manager: int # это поле берем из dds.managers
+    client_id: varchar
+    client: varchar 
     sales_channel: varchar
     region: varchar
 
@@ -25,15 +33,6 @@ class ManagerRawObj(BaseModel):
 
 class ManagerDdsObj(BaseModel):
     manager: varchar
-
-
-class ClientDdsObj(BaseModel):
-    id_manager: int # это поле берем из dds.managers
-    client_id: varchar
-    client: varchar 
-    sales_channel: varchar
-    region: varchar
-
 
 
 class ClientRawRepository:
