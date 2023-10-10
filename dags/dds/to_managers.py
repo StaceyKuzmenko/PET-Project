@@ -23,17 +23,16 @@ class ManagerDdsObj(BaseModel):
 
 class ManagerRawRepository:
     def load_raw_manager(self, conn: Connection) -> List[ManagerRawObj]:
-    with conn.cursor(row_factory=class_row(ManagerRawObj)) as cur:
+        with conn.cursor(row_factory=class_row(ManagerRawObj)) as cur:
             cur.execute(
                 """
                     SELECT
                         manager
                     FROM stg.new_sales
                 """,
-                )
+            )
             objs = cur.fetchall()
         return objs
-
 
 
 class ManagerDdsRepository:
@@ -47,7 +46,7 @@ class ManagerDdsRepository:
                 """,
                 {
                     "manager": manager.manager,
-               },
+                },
             )
 
 
@@ -55,5 +54,5 @@ class ManagerLoader:
     def __init__(self, pg_conn: PgConnect, log: Logger) -> None:
         self.conn = pg_conn
         self.dds = ManagerDestRepository()
-        self.raw = ManagerRawRepository()        
+        self.raw = ManagerRawRepository()
         self.log = log
