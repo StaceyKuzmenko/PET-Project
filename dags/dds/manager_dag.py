@@ -10,43 +10,9 @@ from airflow.hooks.base import BaseHook
 from configparser import ConfigParser
 
 
-def config(filename='database.ini', section='postgresql'):
-    parser = ConfigParser()
-    parser.read(filename)
-    db = {}
-
-    if parser.has_section(section):
-        params = parser.items(section)
-        for param in params:
-            db[param[0]] = param[1]
-    else:
-        raise Exception('Bagian {0} tidak ditemukan didalam {1} file'.format(section, filename))
-
-    return db
-
 def connect():
-    """Koneksi ke PostgreSQL Database server"""
-    conn = None
-    try:
-        params = config()
-        print('Menghubungkan ke PostgreSQL database...')
-        conn = psycopg2.connect(dbname="project_db", host="95.143.191.48", user="project_user", password="project_password", port="5433")
-
-        cur = conn.cursor()
-
-        print('PostgreSQL database version:')
-        cur.execute('SELECT version()')
-
-        db_version = cur.fetchone()
-        print(db_version)
-       
-        cur.close()
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-    finally:
-        if conn is not None:
-            conn.close()
-            print('Koneksi Database telah ditutup.')
+    conn = psycopg2.connect(dbname="project_db", host="95.143.191.48", user="project_user", password="project_password", port="5433")
+    cur = conn.cursor()
 
 
 default_args = {
@@ -56,7 +22,7 @@ default_args = {
 
 def manager_dag():
     # Создаем подключение к базе dwh.
-#    dwh_pg_connect = ConnectionBuilder.pg_conn("project_db")
+    dwh_pg_connect = connect("project_db")
     
     start_task = DummyOperator(task_id="start")
    
