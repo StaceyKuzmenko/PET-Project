@@ -10,6 +10,19 @@ from datetime import datetime
 
 log = logging.getLogger(__name__)
 
+CREATE TABLE sales (
+	id int4 PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY,
+	id_manager int4 not null, –это поле берем из dds.managers
+	client_id varchar not null,
+	order_number varchar not null,
+	realization_number varchar not null,
+	item_number varchar not null,
+	count int not null,
+	total_sum numeric(14, 2) not null
+);
+
+
+
 class SaleRawObj(BaseModel):
     manager_id: int
     manager: varchar 
