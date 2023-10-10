@@ -1,6 +1,5 @@
 from datetime import datetime
 from airflow import DAG
-from airflow.operators.empty import EmptyOperator
 from airflow.decorators import dag, task
 from airflow.operators.dummy import DummyOperator
 from contextlib import contextmanager
@@ -24,22 +23,18 @@ def manager_dag():
     # Создаем подключение к базе dwh.
     dwh_pg_connect = connect()
     
-    start_task = DummyOperator(task_id="start")
+#    start_task = DummyOperator(task_id="start")
    
     @task(task_id="load_managers")
     def load_managers():
         managers_loader = ManagerLoader(dwh_pg_connect, log)
         managers_loader.load_managers()  # Вызываем функцию, которая перельет данные.
 
-    end_task = DummyOperator(task_id="end")
-
+#    end_task = DummyOperator(task_id="end")
 
     # Инициализируем объявленные tasks.
-    managers_load = load_managers()
+    managers_load = load_managers()       
+
+    managers_load
     
-
-    # Далее задаем последовательность выполнения tasks.
-    start_task >> managers_load >> end_task
-
-
 manager_dag = manager_dag()  
