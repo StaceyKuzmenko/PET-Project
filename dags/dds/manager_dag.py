@@ -36,9 +36,8 @@ def load_managers():
     managers_loader = ManagerLoader(dwh_pg_connect, log)
     managers_loader.load_managers()  # Вызываем функцию, которая перельет данные.
     
-    # Инициализируем объявленные tasks.
-    managers_load = load_managers() 
-    return managers_load
+# Инициализируем объявленные tasks.
+managers_load = load_managers() 
 
 end = DummyOperator(task_id="end")
 
