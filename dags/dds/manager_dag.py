@@ -30,13 +30,15 @@ dag = DAG(
 )
 
 start = DummyOperator(task_id="start")
-        
-def load_managers(task_id="load_managers"):
+
+@task(task_id="load_managers")
+def load_managers():
     managers_loader = ManagerLoader(dwh_pg_connect, log)
     managers_loader.load_managers()  # Вызываем функцию, которая перельет данные.
     
     # Инициализируем объявленные tasks.
-    managers_load = load_managers()   
+    managers_load = load_managers() 
+    return managers_load
 
 end = DummyOperator(task_id="end")
 
