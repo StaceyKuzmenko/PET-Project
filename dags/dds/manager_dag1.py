@@ -30,7 +30,7 @@ from configparser import ConfigParser
 # set postgresql connection from basehook
 # all of these connections should be in Airflow as connectors
 
-PG_WAREHOUSE_CONNECTION = {
+'PG_WAREHOUSE_CONNECTION' = {
     "host": "95.143.191.48",
     "user": "project_user",
     "password": "project_password",
@@ -46,7 +46,7 @@ conn_1 = psycopg2.connect(
     f"""
     host='{pg_conn_1.host}'
     port='{pg_conn_1.port}'
-    dbname='{pg_conn_1.db}' 
+    dbname='{pg_conn_1.dbname}' 
     user='{pg_conn_1.user}' 
     password='{pg_conn_1.password}'
     """
