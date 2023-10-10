@@ -1,3 +1,4 @@
+import pendulum
 from datetime import datetime
 from airflow import DAG
 from airflow.decorators import dag, task
@@ -21,7 +22,7 @@ default_args = {
 
 dag = DAG(
     dag_id="manager_dag",
-    start_date=datetime.datetime(2023, 11, 5),
+    start_date=pendulum.datetime(2023, 10, 10),
     schedule="@daily",
     catchup=False
 )
