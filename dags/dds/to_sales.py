@@ -10,50 +10,35 @@ from datetime import datetime
 
 log = logging.getLogger(__name__)
 
-CREATE TABLE sales (
-	id int4 PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY,
-	id_manager int4 not null, –это поле берем из dds.managers
-	client_id varchar not null,
-	order_number varchar not null,
-	realization_number varchar not null,
-	item_number varchar not null,
-	count int not null,
-	total_sum numeric(14, 2) not null
-);
-
-
 
 class SaleRawObj(BaseModel):
     manager_id: int
-    manager: varchar 
+    manager: varchar
     client_id: varchar
     client: varchar
     sales_channel: varchar
-    region: varchar 
-    order_date: varchar 
-    order_number: varchar 
-    realization_date: varchar 
-    realization_number: varchar 
-    product_id: varchar 
-    item_number: varchar 
-    product_name: varchar 
+    region: varchar
+    order_date: varchar
+    order_number: varchar
+    realization_date: varchar
+    realization_number: varchar
+    product_id: varchar
+    item_number: varchar
+    product_name: varchar
     brand: varchar
-    count: int
-    price: numeric(14, 2) 
-    total_sum: numeric(14, 2) 
-    comment: varchar 
-
-
-class SaleDdsObj(BaseModel):
-    order_date: varchar 
-    order_number: varchar 
-    realization_date: varchar 
-    realization_number: varchar 
-    item_number: varchar 
     count: int
     price: numeric(14, 2)
     total_sum: numeric(14, 2)
-    comment: varchar null
+    comment: varchar
+
+
+class SaleDdsObj(BaseModel):
+    client_id: varchar
+    order_number: varchar
+    realization_number: varchar
+    item_number: varchar
+    count: int
+    total_sum: numeric(14, 2)
 
 
 class ManagerRawObj(BaseModel):
@@ -62,23 +47,21 @@ class ManagerRawObj(BaseModel):
 
 
 class ManagerDdsObj(BaseModel):
-    manager_id: int
     manager: varchar
 
 
 class ManagerRawRepository:
     def load_raw_manager(self, conn: Connection) -> List[ManagerRawObj]:
-    with conn.cursor(row_factory=class_row(ManagerRawObj)) as cur:
+        with conn.cursor(row_factory=class_row(ManagerRawObj)) as cur:
             cur.execute(
                 """
                     SELECT
                         manager
                     FROM stg.new_sales
                 """,
-                )
+            )
             objs = cur.fetchall()
         return objs
-
 
 
 class ManagerDdsRepository:
@@ -86,96 +69,62 @@ class ManagerDdsRepository:
         with conn.cursor() as cur:
             cur.execute(
                 """
-                    INSERT INTO dds.managers(manager)
-                    VALUES (%(manager)s)
+		    SELECT id
+                    FROM dds.managers(id)
+                    INSERT INTO dds.sales(id_manager)
+                    VALUES (%(id_manager)s)
                     
                 """,
                 {
-                    "manager": manager.manager,
-               },
-            )
-
-
-class ManagerLoader:
-    def __init__(self, pg_conn: PgConnect, log: Logger) -> None:
-        self.conn = pg_conn
-        self.dds = ManagerDestRepository()
-        self.raw = ManagerRawRepository()        
-        self.log = log
-
-
-
-
-class ClientRawRepository:
-    def load_raw_client(self, conn: Connection) -> List[ClientRawObj]:
-    with conn.cursor(row_factory=class_row(ClientRawObj)) as cur:
-            cur.execute(
-                """
-                    SELECT
-                        client_id,
-                        client,
-                        sales_channel,
-                        region
-                    FROM stg.new_sales
-                """,
-                )
-            objs = cur.fetchall()
-        return objs
-
-
-class ClientDdsRepository:
-    def insert_client(self, conn: Connection, client: ClientDdsObj) -> None:
-        with conn.cursor() as cur:
-            cur.execute(
-                """
-                    INSERT INTO dds.clients(client_id, client, sales_channel, region)
-                    VALUES (%(client_id)s, %(client)s, %(sales_channel)s, %(region)s)
-                    
-                """,
-                {
-                    "client_id": clients.client_id,
-                    "client": clients.client,
-                    "sales_channel": clients.sales_channel,
-                    "region": clients.region 
+                    "id_manager": sales.id_manager,
                 },
             )
 
 
-class ManagerRawRepository:
-    def load_raw_manager(self, conn: Connection) -> List[ManagerRawObj]:
-    with conn.cursor(row_factory=class_row(ManagerRawObj)) as cur:
+class SaleRawRepository:
+    def load_raw_sale(self, conn: Connection) -> List[SaleRawObj]:
+        with conn.cursor(row_factory=class_row(SaleRawObj)) as cur:
             cur.execute(
                 """
                     SELECT
-                        manager
+                            client_id,
+                            order_number, 
+                            realization_number, 
+                            item_number, 
+                            count,
+                            total_sum
                     FROM stg.new_sales
                 """,
-                )
+            )
             objs = cur.fetchall()
         return objs
 
 
-
-class ManagerDdsRepository:
-    def insert_manager(self, conn: Connection, manager: ManagerDdsObj) -> None:
+class SaleDdsRepository:
+    def insert_client(self, conn: Connection, sale: SaleDdsObj) -> None:
         with conn.cursor() as cur:
             cur.execute(
                 """
-                    INSERT INTO dds.clients(manager)
-                    VALUES (%(manager)s)
+                    INSERT INTO dds.sales(client_id, order_number, realization_number, item_number, count, total_sum, comment)
+                    VALUES (%(order_date)s, %(order_number)s, %(realization_number)s, %(item_number)s, %(count)s, %(total_sum)s)
                     
                 """,
                 {
-                    "manager": clients.manager,
-               },
+                    "client_id": sales.client_id,
+                    "order_number": sales.order_number,
+                    "realization_number": sales.realization_number,
+                    "item_number": sales.item_number,
+                    "count": sales.count,
+                    "total_sum": sales.total_sum,
+                },
             )
 
 
-class ClientLoader:
+class SaleLoader:
     def __init__(self, pg_conn: PgConnect, log: Logger) -> None:
         self.conn = pg_conn
-        self.dds = CourierDestRepository()
-        self.raw = CourierRawRepository()        
+        self.dds = SaleDdsRepository()
+        self.raw = SaleRawRepository()
         self.log = log
 
 
@@ -183,6 +132,5 @@ class ManagerLoader:
     def __init__(self, pg_conn: PgConnect, log: Logger) -> None:
         self.conn = pg_conn
         self.dds = ManagerDestRepository()
-        self.raw = ManagerRawRepository()        
+        self.raw = ManagerRawRepository()
         self.log = log
-
