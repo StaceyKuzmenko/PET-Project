@@ -9,7 +9,7 @@ import psycopg2
 from airflow.hooks.base import BaseHook
 
 conn = psycopg2.connect(dbname="project_db", host="95.143.191.48", user="project_user", password="project_password", port="5433")
-conn_id = conn
+conn_id = postgres_db_conn
 
 class PgConnect:
     def __init__(self, host: str, port: str, db_name: str, user: str, pw: str, sslmode: str = "require") -> None:
