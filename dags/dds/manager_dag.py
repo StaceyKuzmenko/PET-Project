@@ -24,7 +24,7 @@ default_args = {
     schedule_interval=None,  
     start_date=pendulum.datetime(2023, 10, 10, tz="UTC"),  
     catchup=False,  
-    tags=['PET-Progect', 'dds'],  
+    tags=['PET-Project', 'dds'],  
     is_paused_upon_creation=False  
 )
 
