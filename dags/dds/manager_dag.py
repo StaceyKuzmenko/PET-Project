@@ -29,21 +29,13 @@ dag = DAG(
     is_paused_upon_creation=False
 )
 
-#start = DummyOperator(task_id="start")
-@task(DummyOperator(task_id="start))
 
 @task(task_id="load_managers")
 def load_managers():
     managers_loader = ManagerLoader(dwh_pg_connect, log)
     managers_loader.load_managers()  # Вызываем функцию, которая перельет данные.
     
-   # Инициализируем объявленные tasks.
-   managers_load = load_managers() 
+# Инициализируем объявленные tasks.
+managers_load = load_managers() 
 
-   managers_load
-
-#end = DummyOperator(task_id="end")
-
-#start >> managers_load >> end
-
-start >> load_managers
+managers_load
