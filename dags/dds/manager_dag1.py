@@ -35,8 +35,7 @@ PG_WAREHOUSE_CONNECTION = {
     "user": "project_user",
     "password": "project_password",
     "port": 5433,
-    "ssl": False,
-    "database": "project_db"
+    "dbname": "project_db"
 }
 
 pg_conn_1 = PostgresHook.get_connection('PG_WAREHOUSE_CONNECTION')
@@ -47,8 +46,8 @@ conn_1 = psycopg2.connect(
     f"""
     host='{pg_conn_1.host}'
     port='{pg_conn_1.port}'
-    dbname='{pg_conn_1.schema}' 
-    user='{pg_conn_1.login}' 
+    dbname='{pg_conn_1.db}' 
+    user='{pg_conn_1.user}' 
     password='{pg_conn_1.password}'
     """
     )   
