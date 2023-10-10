@@ -4,9 +4,9 @@ import os
 #import pydantic
 #import logger
 
-def get_files_from_ftp(folder_list:list, user, passwd):
+def get_files_from_ftp(folder_list:list, host, user:str, passwd:str):
     #establishing ftp connetion and 
-    ftp = FTP(ftp_host)
+    ftp = FTP(host)
     ftp.login(user=username, passwd=password)
     
     for folder in folder_list:
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     password = 'K8OCG7fSGlO3'
     
     folders = ('forecast', 'category', 'sales')
-    get_files_from_ftp(folder_list=folders, user=username, passwd=password)
+    get_files_from_ftp(folder_list=folders, host=ftp_host, user=username, passwd=password)
 
 
     
