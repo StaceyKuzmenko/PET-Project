@@ -10,164 +10,55 @@ from datetime import datetime
 
 log = logging.getLogger(__name__)
 
-CREATE TABLE product_category (
-	item_number varchar not NULL,          ####
-	product_name varchar not NULL,
-	brand varchar not NULL,
-	product_category varchar NULL
-
-CREATE TABLE new_sales(
-	manager_id int4 null,
-	manager varchar null,
-	client_id varchar not null,
-	client varchar not null,
-	sales_channel varchar null,
-	region varchar null,
-	order_date varchar null,        ####
-	order_number varchar null,         ####
-	realization_date varchar null,        ####
-	realization_number varchar null,        #####
-	product_id varchar not null,
-	item_number varchar not null,          ####
-	product_name varchar not null,
-	brand varchar null,
-	count int null,                              ####
-	price numeric(14, 2) null,                     ####
-	total_sum numeric(14, 2) null,                    #####
-	comment varchar null                                  ####
-
-
-  
 CREATE TABLE orders_realizations (
 	id int4 PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY,
 	order_date date NOT null,
 	order_number varchar not null,
-  realization_date date NOT null,
+        realization_date date NOT null,
 	realization_number varchar not null,
 	item_number varchar not null,
 	count int not null,
 	price numeric(14, 2) not null,
 	total_sum numeric(14, 2) not null,
 	comment varchar null
+);
 
 
 
-  
 
-
-class ProductRawObj(BaseModel):
-    item_number: varchar 
-	  product_name: varchar
-	  brand: varchar
-	  product_category: varchar
-
-
-class ProductDdsObj(BaseModel):
-    item_number: varchar
 
 
 class SaleRawObj(BaseModel):
     manager_id: int
-	  manager: varchar 
-	  client_id varchar not null,
-	  client varchar not null,
-	  sales_channel varchar null,
-	  region varchar null,
-	  order_date varchar null,        ####
-	  order_number varchar null,         ####
-	  realization_date varchar null,        ####
-	  realization_number varchar null,        #####
-	  product_id varchar not null,
-	  item_number varchar not null,          ####
-	  product_name varchar not null,
-	  brand varchar null,
-	  count int null,                              ####
-	  price numeric(14, 2) null,                     ####
-	  total_sum numeric(14, 2) null,                    #####
-	  comment varchar null                                  ####
-
+    manager: varchar 
+    client_id: varchar
+    client: varchar
+    sales_channel: varchar
+    region: varchar 
+    order_date: varchar 
+    order_number: varchar 
+    realization_date: varchar 
+    realization_number: varchar 
+    product_id: varchar 
+    item_number: varchar 
+    product_name: varchar 
+    brand: varchar
+    count: int
+    price: numeric(14, 2) 
+    total_sum: numeric(14, 2) 
+    comment: varchar 
 
 
 class SaleDdsObj(BaseModel):
-    manager_id: int
-	  manager: varchar 
-	  client_id varchar not null,
-	  client varchar not null,
-	  sales_channel varchar null,
-	  region varchar null,
-	  order_date varchar null,        ####
-	  order_number varchar null,         ####
-	  realization_date varchar null,        ####
-	  realization_number varchar null,        #####
-	  product_id varchar not null,
-	  item_number varchar not null,          ####
-	  product_name varchar not null,
-	  brand varchar null,
-	  count int null,                              ####
-	  price numeric(14, 2) null,                     ####
-	  total_sum numeric(14, 2) null,                    #####
-	  comment varchar null                                  ####
-
-
-CREATE TABLE sales (
-	id int4 PRIMARY KEY NOT NULL GENERATED ALWAYS AS IDENTITY,
-	id_manager int4 not null, –это поле берем из dds.managers
-	client_id varchar not null,
-	order_number varchar not null,
-	realization_number varchar not null,
-	item_number varchar not null,
-	count int not null,
-	total_sum numeric(14, 2) not null
-
-
-class ManagerRawObj(BaseModel):
-    manager_id: int
-    manager: varchar
-
-
-class ManagerDdsObj(BaseModel):
-    manager_id: int
-    manager: varchar
-
-
-class ManagerRawRepository:
-    def load_raw_manager(self, conn: Connection) -> List[ManagerRawObj]:
-    with conn.cursor(row_factory=class_row(ManagerRawObj)) as cur:
-            cur.execute(
-                """
-                    SELECT
-                        manager
-                    FROM stg.new_sales
-                """,
-                )
-            objs = cur.fetchall()
-        return objs
-
-
-
-class ManagerDdsRepository:
-    def insert_manager(self, conn: Connection, manager: ManagerDdsObj) -> None:
-        with conn.cursor() as cur:
-            cur.execute(
-                """
-                    INSERT INTO dds.managers(manager)
-                    VALUES (%(manager)s)
-                    
-                """,
-                {
-                    "manager": manager.manager,
-               },
-            )
-
-
-class ManagerLoader:
-    def __init__(self, pg_conn: PgConnect, log: Logger) -> None:
-        self.conn = pg_conn
-        self.dds = ManagerDestRepository()
-        self.raw = ManagerRawRepository()        
-        self.log = log
-
-
+    order_date: varchar 
+    order_number: varchar 
+    realization_date: varchar 
+    realization_number: varchar 
+    item_number: varchar 
+    count: int
+    price: numeric(14, 2)
+    total_sum: numeric(14, 2)
+    comment: varchar null
 
 
 class ClientRawRepository:
