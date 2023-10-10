@@ -3,7 +3,6 @@ from airflow import DAG
 from airflow.operators.empty import EmptyOperator
 from airflow.decorators import dag, task
 from airflow.operators.dummy import DummyOperator
-import ConnectionBuilder
 from contextlib import contextmanager
 from typing import Generator
 import psycopg
