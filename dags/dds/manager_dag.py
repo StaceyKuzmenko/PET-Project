@@ -8,6 +8,7 @@ from typing import Generator
 import psycopg2
 from airflow.hooks.base import BaseHook
 
+conn = psycopg2.connect(dbname="project_db", host="95.143.191.48", user="project_user", password="project_password", port="5433")
 
 class PgConnect:
     def __init__(self, host: str, port: str, db_name: str, user: str, pw: str, sslmode: str = "require") -> None:
