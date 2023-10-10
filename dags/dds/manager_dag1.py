@@ -35,7 +35,8 @@ PG_WAREHOUSE_CONNECTION = {
     "user": "project_user",
     "password": "project_password",
     "port": 5433,
-    "dbname": "project_db"
+#    "dbname": "project_db"
+    "dbname": "postgres_db_conn"
 }
 
 pg_conn_1 = PostgresHook.get_connection(PG_WAREHOUSE_CONNECTION)
