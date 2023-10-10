@@ -1,10 +1,9 @@
 from datetime import datetime
 from airflow import DAG
-from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
-from airflow.operators.bash import BashOperator
+from airflow.operators.empty import EmptyOperator
 from airflow.decorators import dag, task
-from airflow.sensors.external_task import ExternalTaskSensor
 from airflow.operators.dummy import DummyOperator
+from library.pg_connect import ConnectionBuilder
 
 default_args = {
     "owner": "airflow",
