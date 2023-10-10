@@ -30,26 +30,25 @@ from configparser import ConfigParser
 # set postgresql connection from basehook
 # all of these connections should be in Airflow as connectors
 
-PG_WAREHOUSE_CONNECTION = {
-    "host": "95.143.191.48",
-    "user": "project_user",
-    "password": "project_password",
-    "port": 5433,
+#PG_WAREHOUSE_CONNECTION = {
+#    "host": "95.143.191.48",
+#    "user": "project_user",
+#    "password": "project_password",
+#    "port": 5433,
 #    "dbname": "project_db"
-    "dbname": "postgres_db_conn"
-}
+#}
 
-pg_conn_1 = PostgresHook.get_connection(PG_WAREHOUSE_CONNECTION)
+#pg_conn_1 = PostgresHook.get_connection(PG_WAREHOUSE_CONNECTION)
 
 # init connection
 # Connect to your local postgres DB (Docker)
 conn_1 = psycopg2.connect(
     f"""
-    host='{pg_conn_1.host}'
-    port='{pg_conn_1.port}'
-    dbname='{pg_conn_1.dbname}' 
-    user='{pg_conn_1.user}' 
-    password='{pg_conn_1.password}'
+    host='95.143.191.48'
+    port='5433'
+    dbname='project_db' 
+    user='project_user' 
+    password='project_password'
     """
     )   
 
