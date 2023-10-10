@@ -17,6 +17,7 @@ class ManagerRawObj(BaseModel):
 
 
 class ManagerDdsObj(BaseModel):
+    manager_id: int
     manager: varchar
 
 
