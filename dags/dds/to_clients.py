@@ -89,12 +89,14 @@ class ManagerDdsRepository:
         with conn.cursor() as cur:
             cur.execute(
                 """
-                    INSERT INTO dds.clients(manager)
-                    VALUES (%(manager)s)
+                    SELECT id
+                    FROM dds.managers
+                    INSERT INTO dds.clients(id_manager)
+                    VALUES (%(id_manager)s)
                     
                 """,
                 {
-                    "manager": clients.manager,
+                    "id_manager": clients.id_manager,
                 },
             )
 
