@@ -29,7 +29,7 @@ dag = DAG(
     is_paused_upon_creation=False
 )
 
-start = DummyOperator(task_id="start")
+#start = DummyOperator(task_id="start")
 
 @task(task_id="load_managers")
 def load_managers():
@@ -39,6 +39,8 @@ def load_managers():
 # Инициализируем объявленные tasks.
 managers_load = load_managers() 
 
-end = DummyOperator(task_id="end")
+managers_load
 
-start >> managers_load >> end
+#end = DummyOperator(task_id="end")
+
+#start >> managers_load >> end
