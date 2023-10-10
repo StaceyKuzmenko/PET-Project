@@ -1,5 +1,5 @@
 import datetime
-from lib.ftp_download import get_files_from_ftp
+from library.ftp_download import get_files_from_ftp
 
 from airflow import DAG
 from airflow.operators.empty import EmptyOperator
