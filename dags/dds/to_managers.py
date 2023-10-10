@@ -31,7 +31,7 @@ class ManagerRawRepository:
                 """
                     SELECT
                         manager
-                    FROM stg.new_sales
+                    FROM stg.old_sales
                 """,
             )
             objs = cur.fetchall()
