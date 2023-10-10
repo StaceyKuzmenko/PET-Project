@@ -8,6 +8,7 @@ from typing import Generator
 import psycopg2
 from airflow.hooks.base import BaseHook
 
+
 class PgConnect:
     def __init__(self, host: str, port: str, db_name: str, user: str, pw: str, sslmode: str = "require") -> None:
         self.host = host
@@ -38,7 +39,7 @@ class PgConnect:
         return psycopg2.connect(self.url())
 
     @contextmanager
-    def connection(self) -> Generator[psycopg2.Connection, None, None]:
+    def connection(self) -> Generator[psycopg2.connect, None, None]:
         conn = psycopg2.connect(self.url())
         try:
             yield conn
@@ -77,8 +78,8 @@ default_args = {
 
 def manager_dag():
     # Создаем подключение к базе dwh.
-    dwh_pg_connect = ConnectionBuilder.pg_conn("postgres_db_conn")
-
+    dwh_pg_connect = ConnectionBuilder.pg_conn("project_db")
+    
     start_task = DummyOperator(task_id="start")
    
     @task(task_id="load_managers")
