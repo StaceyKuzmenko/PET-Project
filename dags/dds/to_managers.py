@@ -26,7 +26,7 @@ class ManagerDdsObj(BaseModel):
 
 class ManagerRawRepository:
     def load_raw_manager(self, conn: connect()) -> List[ManagerRawObj]:
-        with conn.cursor(row_factory=class_row(ManagerRawObj)) as cur:
+        with conn.cursor() as cur:
             cur.execute(
                 """
                     SELECT
