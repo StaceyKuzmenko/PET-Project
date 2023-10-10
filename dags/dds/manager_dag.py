@@ -7,70 +7,46 @@ from contextlib import contextmanager
 from typing import Generator
 import psycopg2
 from airflow.hooks.base import BaseHook
+from configparser import ConfigParser
 
-conn = psycopg2.connect(dbname="project_db", host="95.143.191.48", user="project_user", password="project_password", port="5433")
-conn_id = postgres_db_conn
 
-class PgConnect:
-    def __init__(self, host: str, port: str, db_name: str, user: str, pw: str, sslmode: str = "require") -> None:
-        self.host = host
-        self.port = int(port)
-        self.db_name = db_name
-        self.user = user
-        self.pw = pw
-        self.sslmode = sslmode
+def config(filename='database.ini', section='postgresql'):
+    parser = ConfigParser()
+    parser.read(filename)
+    db = {}
 
-    def url(self) -> str:
-        return """
-            host={host}
-            port={port}
-            dbname={db_name}
-            user={user}
-            password={pw}
-            target_session_attrs=read-write
-            sslmode={sslmode}
-        """.format(
-            host=self.host,
-            port=self.port,
-            db_name=self.db_name,
-            user=self.user,
-            pw=self.pw,
-            sslmode=self.sslmode)
+    if parser.has_section(section):
+        params = parser.items(section)
+        for param in params:
+            db[param[0]] = param[1]
+    else:
+        raise Exception('Bagian {0} tidak ditemukan didalam {1} file'.format(section, filename))
 
-    def client(self):
-        return psycopg2.connect(self.url())
+    return db
 
-    @contextmanager
-    def connection(self) -> Generator[psycopg2.connect, None, None]:
-        conn = psycopg2.connect(self.url())
-        try:
-            yield conn
-            conn.commit()
-        except Exception as e:
-            conn.rollback()
-            raise e
-        finally:
+def connect():
+    """Koneksi ke PostgreSQL Database server"""
+    conn = None
+    try:
+        params = config()
+        print('Menghubungkan ke PostgreSQL database...')
+        conn = psycopg2.connect(dbname="project_db", host="95.143.191.48", user="project_user", password="project_password", port="5433")
+
+        cur = conn.cursor()
+
+        print('PostgreSQL database version:')
+        cur.execute('SELECT version()')
+
+        db_version = cur.fetchone()
+        print(db_version)
+       
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
             conn.close()
-
-
-class ConnectionBuilder:
-
-    @staticmethod
-    def pg_conn(conn_id: str) -> PgConnect:
-        conn = BaseHook.get_connection(conn_id)
-
-        sslmode = "require"
-        if "sslmode" in conn.extra_dejson:
-            sslmode = conn.extra_dejson["sslmode"]
-
-        pg = PgConnect(str(conn.host),
-                       str(conn.port),
-                       str(conn.schema),
-                       str(conn.login),
-                       str(conn.password),
-                       sslmode)
-
-        return pg
+            print('Koneksi Database telah ditutup.')
 
 
 default_args = {
@@ -80,7 +56,7 @@ default_args = {
 
 def manager_dag():
     # Создаем подключение к базе dwh.
-    dwh_pg_connect = ConnectionBuilder.pg_conn("project_db")
+#    dwh_pg_connect = ConnectionBuilder.pg_conn("project_db")
     
     start_task = DummyOperator(task_id="start")
    
