@@ -26,8 +26,7 @@ dag = DAG(
     start_date=pendulum.datetime(2023, 9, 1),
     catchup=False,
     tags=["PET-Project", "dds"],
-    is_paused_upon_creation=False,
-    default_args=args,
+    is_paused_upon_creation=False
 )
 
 start = DummyOperator(task_id="start")
