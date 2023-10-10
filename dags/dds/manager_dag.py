@@ -20,32 +20,24 @@ default_args = {
     "start_date": datetime(2023, 1, 1),
 }
 
-dag = DAG(
-    dag_id="manager_dag",
-    start_date=pendulum.datetime(2023, 10, 10),
-    schedule="@daily",
-    catchup=False
+@dag(
+    schedule_interval=None,  
+    start_date=pendulum.datetime(2023, 10, 10, tz="UTC"),  
+    catchup=False,  
+    tags=['PET-Progect', 'dds'],  
+    is_paused_upon_creation=False  
 )
 
 def manager_dag():
     # Создаем подключение к базе dwh.
     dwh_pg_connect = connect()
 
-    start_task = DummyOperator(task_id="start")
+        @task(task_id="load_managers")
+        def load_managers():
+            managers_loader = ManagerLoader(dwh_pg_connect, log)
+            managers_loader.load_managers()  # Вызываем функцию, которая перельет данные.
 
-    #    @task(task_id="load_managers")
-    #    def load_managers():
-    #        managers_loader = ManagerLoader(dwh_pg_connect, log)
-    #        managers_loader.load_managers()  # Вызываем функцию, которая перельет данные.
-
-    # Инициализируем объявленные tasks.
-    #   managers_load = load_managers()
-
-    end_task = DummyOperator(task_id="end")
-
-    #   start_task >> managers_load >> end_task
-
-    start_task >> end_task
-
+        Инициализируем объявленные tasks.
+        managers_load = load_managers()   
 
 manager_dag = manager_dag()
