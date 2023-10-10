@@ -19,9 +19,9 @@ class ClientRawObj(BaseModel):
 
 
 class ClientDdsObj(BaseModel):
-    id_manager: int # это поле берем из dds.managers
+    id_manager: int  # это поле берем из dds.managers
     client_id: varchar
-    client: varchar 
+    client: varchar
     sales_channel: varchar
     region: varchar
 
@@ -37,7 +37,7 @@ class ManagerDdsObj(BaseModel):
 
 class ClientRawRepository:
     def load_raw_client(self, conn: Connection) -> List[ClientRawObj]:
-    with conn.cursor(row_factory=class_row(ClientRawObj)) as cur:
+        with conn.cursor(row_factory=class_row(ClientRawObj)) as cur:
             cur.execute(
                 """
                     SELECT
@@ -47,7 +47,7 @@ class ClientRawRepository:
                         region
                     FROM stg.new_sales
                 """,
-                )
+            )
             objs = cur.fetchall()
         return objs
 
@@ -65,24 +65,23 @@ class ClientDdsRepository:
                     "client_id": clients.client_id,
                     "client": clients.client,
                     "sales_channel": clients.sales_channel,
-                    "region": clients.region 
+                    "region": clients.region,
                 },
             )
 
 
 class ManagerRawRepository:
     def load_raw_manager(self, conn: Connection) -> List[ManagerRawObj]:
-    with conn.cursor(row_factory=class_row(ManagerRawObj)) as cur:
+        with conn.cursor(row_factory=class_row(ManagerRawObj)) as cur:
             cur.execute(
                 """
                     SELECT
                         manager
                     FROM stg.new_sales
                 """,
-                )
+            )
             objs = cur.fetchall()
         return objs
-
 
 
 class ManagerDdsRepository:
@@ -96,7 +95,7 @@ class ManagerDdsRepository:
                 """,
                 {
                     "manager": clients.manager,
-               },
+                },
             )
 
 
@@ -104,7 +103,7 @@ class ClientLoader:
     def __init__(self, pg_conn: PgConnect, log: Logger) -> None:
         self.conn = pg_conn
         self.dds = CourierDestRepository()
-        self.raw = CourierRawRepository()        
+        self.raw = CourierRawRepository()
         self.log = log
 
 
@@ -112,6 +111,5 @@ class ManagerLoader:
     def __init__(self, pg_conn: PgConnect, log: Logger) -> None:
         self.conn = pg_conn
         self.dds = ManagerDestRepository()
-        self.raw = ManagerRawRepository()        
+        self.raw = ManagerRawRepository()
         self.log = log
-
