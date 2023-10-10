@@ -22,7 +22,7 @@ default_args = {
 
 def manager_dag():
     # Создаем подключение к базе dwh.
-    dwh_pg_connect = connect("project_db")
+    dwh_pg_connect = connect()
     
     start_task = DummyOperator(task_id="start")
    
