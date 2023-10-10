@@ -1,7 +1,7 @@
 import logging
 from logging import Logger
 from typing import List, Optional
-from lib import PgConnect
+from library import PgConnect
 from psycopg import Connection
 from psycopg.rows import class_row
 from pydantic import BaseModel
