@@ -7,7 +7,7 @@ import os
 def get_files_from_ftp(folder_list:list, host, user:str, passwd:str):
     #establishing ftp connetion and 
     ftp = FTP(host)
-    ftp.login(user=username, passwd=password)
+    ftp.login(user=user, passwd=passwd)
     
     for folder in folder_list:
         print('FTP path: ', os.path.join('Engeocom', 'test', folder))
@@ -47,9 +47,9 @@ def get_files_from_ftp(folder_list:list, host, user:str, passwd:str):
 
 
 if __name__ == '__main__':
-    ftp_host = 'ftp.horseforce.ru'
-    username = 'ftp_user2'
-    password = 'K8OCG7fSGlO3'
+    ftp_host = ''
+    username = ''
+    password = ''
     
     folders = ('forecast', 'category', 'sales')
     get_files_from_ftp(folder_list=folders, host=ftp_host, user=username, passwd=password)
