@@ -38,17 +38,7 @@ from configparser import ConfigParser
 #    "dbname": "project_db"
 #}
 
-#pg_conn_1 = PostgresHook.get_connection(PG_WAREHOUSE_CONNECTION)
-
-pg_conn_1 = PostgresHook.get_connection(
-    f"""
-    host='95.143.191.48'
-    port='5433'
-    dbname='project_db' 
-    user='project_user' 
-    password='project_password'
-    """
-    )   
+pg_conn_1 = PostgresHook.get_connection('postgres_db_conn')
 
 # init connection
 # Connect to your local postgres DB (Docker)
