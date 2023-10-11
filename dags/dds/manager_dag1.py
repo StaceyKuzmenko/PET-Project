@@ -34,12 +34,12 @@ def load_managers_to_dds():
 
     # load to local to DB (managers)
     cur_1 = conn_1.cursor()
-#    postgres_insert_query = """ 
-#    SELECT manager
-#    FROM stg.old_sales(manager)
-#    INSERT INTO dds.managers(manager)
+    postgres_insert_query = """ 
+    insert into "DDS".managers(manager)
+    SELECT manager  
+    FROM "STG".old_sales
     """
-#    cur_1.execute(postgres_insert_query)
+    cur_1.execute(postgres_insert_query)
     conn_1.commit()
     conn_1.close()
 
