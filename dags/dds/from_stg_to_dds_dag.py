@@ -108,7 +108,7 @@ default_args = {
 }
 
 with DAG(
-        'manager_dag1',                  
+        'from_stg_to_dds_dag',                  
         default_args=default_args,         
         schedule_interval=None,  
         start_date=datetime(2023, 10, 10),  
