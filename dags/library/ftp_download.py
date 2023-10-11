@@ -37,7 +37,7 @@ def get_files_from_ftp(folder_list:list, host, user:str, passwd:str):
         print(f'{latest_name} -  {datetime.strptime(latest_time[4:], "%Y%m%d%H%M%S").strftime("%d %B %Y %H:%M:%S")}')
 
         #copying the file to the local folder
-        file_name_with_full_path_to_local_folder = os.path.join('/', 'opt', 'compose', 'files_dir', folder, latest_name)
+        file_name_with_full_path_to_local_folder = os.path.join('/', 'opt', 'airflow', 'plugins', 'files_dir', folder, latest_name)
         with open(file_name_with_full_path_to_local_folder, 'wb') as f:
             ftp.retrbinary('RETR '+ latest_name, f.write)
     
