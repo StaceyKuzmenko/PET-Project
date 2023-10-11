@@ -1,23 +1,14 @@
-from datetime import datetime, timedelta
+import pendulum
 import time
-import pandas as pd
-import numpy as np
 import psycopg2
+from datetime import datetime, timedelta
 from wsgiref import headers
-import requests
 from airflow import DAG
 from airflow.decorators import dag, task
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python import PythonOperator
 from airflow.utils.task_group import TaskGroup
-
-import pendulum
-from datetime import datetime
-from airflow.decorators import dag, task
-from airflow.operators.dummy import DummyOperator
-from typing import Generator
-from airflow.hooks.base import BaseHook
-
+#from airflow.operators.dummy import DummyOperator
 
 ### POSTGRESQL settings ###
 # init connection
