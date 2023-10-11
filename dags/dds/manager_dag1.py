@@ -22,110 +22,31 @@ from datetime import datetime
 from airflow.decorators import dag, task
 from airflow.operators.dummy import DummyOperator
 from typing import Generator
-#import psycopg2
-import psycopg
+import psycopg2
 from airflow.hooks.base import BaseHook
 from configparser import ConfigParser
 from contextlib import contextmanager
-
-class PgConnect:
-    def __init__(self, host: str, port: str, db_name: str, user: str, pw: str, sslmode: str = "require") -> None:
-        self.host = host
-        self.port = int(port)
-        self.db_name = db_name
-        self.user = user
-        self.pw = pw
-        self.sslmode = sslmode
-
-    def url(self) -> str:
-        return """
-            host={host}
-            port={port}
-            dbname={db_name}
-            user={user}
-            password={pw}
-            target_session_attrs=read-write
-            sslmode={sslmode}
-        """.format(
-            host=self.host,
-            port=self.port,
-            db_name=self.db_name,
-            user=self.user,
-            pw=self.pw,
-            sslmode=self.sslmode)
-
-    def client(self):
-        return psycopg.connect(self.url())
-
-    @contextmanager
-    def connection(self) -> Generator[psycopg.Connection, None, None]:
-        conn = psycopg.connect(self.url())
-        try:
-            yield conn
-            conn.commit()
-        except Exception as e:
-            conn.rollback()
-            raise e
-        finally:
-            conn.close()
-
-
-class ConnectionBuilder:
-
-    @staticmethod
-    def pg_conn(conn_id: str) -> PgConnect:
-        conn = BaseHook.get_connection(conn_id)
-
-        sslmode = "require"
-        if "sslmode" in conn.extra_dejson:
-            sslmode = conn.extra_dejson["sslmode"]
-
-        pg = PgConnect(str(conn.host),
-                       str(conn.port),
-                       str(conn.schema),
-                       str(conn.login),
-                       str(conn.password),
-                       sslmode)
-
-        return pg
 
 ### POSTGRESQL settings ###
 # set postgresql connection from basehook
 # all of these connections should be in Airflow as connectors
 
-PG_WAREHOUSE_CONNECTION = {
-    "host": "95.143.191.48",
-    "user": "project_user",
-    "password": "project_password",
-    "port": 5433,
-    "dbname": "project_db"
-}
-
 #pg_conn_1 = PostgresHook.get_connection('postgres_db_conn')
 
 # init connection
 # Connect to your local postgres DB (Docker)
-#conn_1 = psycopg2.connect(
-#    f"""
-#    host='95.143.191.48'
-#    port='5433'
-#    dbname='project_db' 
-#    user='project_user' 
-#    password='project_password'
-#    """
-#    )  
 
-dwh_pg_connect = PgConnect(
-    host=PG_WAREHOUSE_CONNECTION["host"],
-    port=PG_WAREHOUSE_CONNECTION["port"],
-    db_name=PG_WAREHOUSE_CONNECTION["database"],
-    user=PG_WAREHOUSE_CONNECTION["user"],
-    pw=PG_WAREHOUSE_CONNECTION["password"],
-    sslmode="require" if PG_WAREHOUSE_CONNECTION["ssl"] else "disable"
-)
+DB_NAME = "project_db"
+DB_USER = "project_user"
+DB_PASS = "project_password"
+DB_HOST = "95.143.191.48"
+DB_PORT = "5433"
 
-
-
+conn = psycopg2.connect(database=DB_NAME,
+                            user=DB_USER,
+                            password=DB_PASS,
+                            host=DB_HOST,
+                            port=DB_PORT)
 
 # load data from STG
 # paste data to DDS local connection
