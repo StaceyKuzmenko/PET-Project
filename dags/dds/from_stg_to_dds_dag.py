@@ -92,16 +92,16 @@ def load_sales_to_dds():
 
 default_args = {
     "owner": "airflow",
-    "start_date": datetime(2023, 1, 1),
+    "start_date": datetime(2017, 1, 1),
 }
 
 with DAG(
         'from_stg_to_dds_dag',                  
         default_args=default_args,         
         schedule_interval=None,  
-        start_date=datetime(2023, 10, 10),  
+        start_date=datetime(2017, 1, 1),  
         catchup=False,                     
-        tags=['Pet-Project', 'dds'],
+        tags=['Pet-Project', 'stg', 'dds'],
 ) as dag:
 
     # create DAG logic (sequence/order)
