@@ -32,7 +32,7 @@ with DAG(
         python_callable= get_files_from_ftp,
         op_kwargs={'folder_list': folders,
                    'host': conn.host,
-                   'user': conn.user,
+                   'user': conn.login,
                    'passwd': conn.password
                    })
 
