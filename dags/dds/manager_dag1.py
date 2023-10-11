@@ -40,6 +40,16 @@ from configparser import ConfigParser
 
 #pg_conn_1 = PostgresHook.get_connection(PG_WAREHOUSE_CONNECTION)
 
+pg_conn_1 = PostgresHook.get_connection(
+    f"""
+    host='95.143.191.48'
+    port='5433'
+    dbname='project_db' 
+    user='project_user' 
+    password='project_password'
+    """
+    )   
+
 # init connection
 # Connect to your local postgres DB (Docker)
 conn_1 = psycopg2.connect(
