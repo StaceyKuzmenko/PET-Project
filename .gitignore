@@ -126,6 +126,7 @@ env/
 venv/
 logs/
 db/
+plugins/
 ENV/
 env.bak/
 venv.bak/
