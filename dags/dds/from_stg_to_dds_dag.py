@@ -50,8 +50,8 @@ def load_clients_to_dds():
     # load to local to DB (clients)
     cur_1 = conn_1.cursor()
     postgres_insert_query = """ 
-    insert into "DDS".clients(client_id, order_number, realization_number, item_number, count, total_sum)
-    SELECT client_id, order_number, realization_number, item_number, count, total_sum  
+    insert into "DDS".clients(client_id, client, sales_channel, region)
+    SELECT client_id, client, sales_channel, region  
     FROM "STG".old_sales
     """
     postgres_insert_query_2 = """ 
