@@ -67,7 +67,7 @@ def load_orders_realizations_to_dds():
     cur_1 = conn_1.cursor()
     postgres_insert_query = """ 
     insert into "DDS".orders_realizations(order_date, order_number, realization_date, realization_number, item_number, count, price, total_sum, comment)
-    SELECT order_date, order_number, realization_date, realization_number, item_number, count, price, total_sum, comment  
+    SELECT CAST(order_date AS DATE), order_number, CAST(realization_date AS DATE), realization_number, item_number, count, price, total_sum, comment  
     FROM "STG".old_sales
     """
     cur_1.execute(postgres_insert_query)    
