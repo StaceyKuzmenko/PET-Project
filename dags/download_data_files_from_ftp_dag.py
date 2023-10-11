@@ -19,7 +19,7 @@ args = {
 
 
 with DAG(
-    dag_id="first_empty_dag",
+    dag_id="download_files_from_ftp_to_local_folders",
     start_date=datetime.datetime(2023, 10, 5),
     description='Download 3 most recent files from data folders',
     schedule="@daily",
