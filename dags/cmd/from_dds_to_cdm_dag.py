@@ -106,12 +106,12 @@ default_args = {
 }
 
 with DAG(
-        'from_stg_to_dds_dag',                  
+        'from_dds_to_cdm_dag',                  
         default_args=default_args,         
         schedule_interval=None,  
         start_date=datetime(2023, 10, 10),  
         catchup=False,                     
-        tags=['Pet-Project', 'dds'],
+        tags=['Pet-Project', 'dds', 'cdm'],
 ) as dag:
 
     # create DAG logic (sequence/order)
