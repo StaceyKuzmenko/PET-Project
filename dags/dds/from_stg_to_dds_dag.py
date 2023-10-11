@@ -35,8 +35,8 @@ def load_managers_to_dds():
     cur_1 = conn_1.cursor()
     postgres_insert_query = """ 
     insert into "DDS".managers(manager)
-    SELECT manager  
-    FROM "STG".old_sales
+    SELECT distinct manager  
+    FROM "STG".old_sales;
     """
     cur_1.execute(postgres_insert_query)
     conn_1.commit()
@@ -50,17 +50,11 @@ def load_clients_to_dds():
     # load to local to DB (clients)
     cur_1 = conn_1.cursor()
     postgres_insert_query = """ 
-    insert into "DDS".clients(client_id, client, sales_channel, region)
-    SELECT client_id, client, sales_channel, region  
-    FROM "STG".old_sales
+    insert into "DDS".clients(id_manager, client_id, client, sales_channel, region)
+    SELECT m.id, os.client_id, os.client, os.sales_channel, os.region 
+    FROM "DDS".managers as m, "STG".old_sales as os;
     """
-    postgres_insert_query_2 = """ 
-    insert into "DDS".clients(id_manager)
-    SELECT id_manager  
-    FROM "DDS".managers
-    """                 
     cur_1.execute(postgres_insert_query)    
-    cur_1.execute(postgres_insert_query_2)  
     conn_1.commit()
     conn_1.close()
 
@@ -88,17 +82,11 @@ def load_sales_to_dds():
     # load to local to DB (sales)
     cur_1 = conn_1.cursor()
     postgres_insert_query = """ 
-    insert into "DDS".sales(client_id, order_number, realization_number, item_number, count, total_sum)
-    SELECT client_id, order_number, realization_number, item_number, count, total_sum  
-    FROM "STG".old_sales
-    """
-    postgres_insert_query_2 = """ 
-    insert into "DDS".sales(id_manager)
-    SELECT id_manager  
-    FROM "DDS".managers
-    """                 
+    insert into "DDS".sales(id_manager, client_id, order_number, realization_number, item_number, count, total_sum)
+    SELECT m.id, os.client_id, os.order_number, os.realization_number, os.item_number, os.count, os.total_sum 
+    FROM "DDS".managers as m, "STG".old_sales as os;
+        """
     cur_1.execute(postgres_insert_query)    
-    cur_1.execute(postgres_insert_query_2)     
     conn_1.commit()
     conn_1.close()
 
