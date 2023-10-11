@@ -3,18 +3,12 @@ import time
 import pandas as pd
 import numpy as np
 import psycopg2
-import json
 from wsgiref import headers
 import requests
-
 from airflow import DAG
+from airflow.decorators import dag, task
 from airflow.operators.dummy_operator import DummyOperator
-from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python import PythonOperator
-from airflow.hooks.base import BaseHook
-from airflow.models.xcom import XCom
-from airflow.providers.postgres.hooks.postgres import PostgresHook
-from airflow.operators.postgres_operator import PostgresOperator
 from airflow.utils.task_group import TaskGroup
 
 import pendulum
@@ -22,17 +16,10 @@ from datetime import datetime
 from airflow.decorators import dag, task
 from airflow.operators.dummy import DummyOperator
 from typing import Generator
-import psycopg2
 from airflow.hooks.base import BaseHook
-from configparser import ConfigParser
-from contextlib import contextmanager
+
 
 ### POSTGRESQL settings ###
-# set postgresql connection from basehook
-# all of these connections should be in Airflow as connectors
-
-# pg_conn_1 = PostgresHook.get_connection('postgres_db_conn')
-
 # init connection
 # Connect to your local postgres DB (Docker)
 
@@ -61,11 +48,9 @@ def load_managers_to_dds():
     FROM stg.old_sales(manager)
     INSERT INTO dds.managers(manager)
     """
-
     cur_1.execute(postgres_insert_query)
     conn_1.commit()
     conn_1.close()
-
 
 default_args = {
     "owner": "airflow",
@@ -75,7 +60,7 @@ default_args = {
 with DAG(
         'manager_dag1',                  
         default_args=default_args,         
-        schedule_interval=None,  # interval
+        schedule_interval=None,  
         start_date=datetime(2023, 10, 10),  
         catchup=False,                     
         tags=['Pet-Project', 'dds'],
@@ -83,11 +68,7 @@ with DAG(
 
     # create DAG logic (sequence/order)
     t1 = DummyOperator(task_id="start")
-    t21 = PythonOperator(task_id="managers", python_callable=load_managers_to_dds, dag=dag)
-#   t22 = PythonOperator(task_id="couriers", python_callable=load_paste_data_couriers, dag=dag)
-#   t23 = PythonOperator(task_id="timestamps", python_callable=load_paste_data_timestamps, dag=dag)
-#   t24 = PythonOperator(task_id="orders", python_callable=load_paste_data_orders, dag=dag)
-#   t25 = PythonOperator(task_id="deliveries", python_callable=load_paste_data_deliveries, dag=dag)
-    t4 = DummyOperator(task_id="end")
+    t11 = PythonOperator(task_id="managers", python_callable=load_managers_to_dds, dag=dag)
+    t2 = DummyOperator(task_id="end")
 
-    t1 >> t21 >> t4
+    t1 >> t11 >> t2
