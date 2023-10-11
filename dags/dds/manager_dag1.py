@@ -25,7 +25,7 @@ from typing import Generator
 import psycopg2
 from airflow.hooks.base import BaseHook
 from configparser import ConfigParser
-from .pg_connect import PgConnect
+from library.pg_connect import PgConnect
 
 
 ### POSTGRESQL settings ###
@@ -40,7 +40,7 @@ PG_WAREHOUSE_CONNECTION = {
     "dbname": "project_db"
 }
 
-pg_conn_1 = PostgresHook.get_connection('postgres_db_conn')
+#pg_conn_1 = PostgresHook.get_connection('postgres_db_conn')
 
 # init connection
 # Connect to your local postgres DB (Docker)
@@ -62,6 +62,9 @@ dwh_pg_connect = PgConnect(
     pw=PG_WAREHOUSE_CONNECTION["password"],
     sslmode="require" if PG_WAREHOUSE_CONNECTION["ssl"] else "disable"
 )
+
+
+
 
 # load data from STG
 # paste data to DDS local connection
