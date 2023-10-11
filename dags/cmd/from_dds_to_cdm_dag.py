@@ -24,83 +24,81 @@ conn_1 = psycopg2.connect(
     database=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port=DB_PORT
 )
 
-# load data from STG
-# paste data to DDS local connection
-def load_managers_to_dds():
+# load data from DDS
+# paste data to CDM local connection
+def load_managers_to_monthly_sales_report():
     # fetching time UTC and table
     fetching_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    current_table = "managers"
+    current_table = "monthly_sales_report"
 
-    # load to local to DB (managers)
+    # load to local to DB (monthly_sales_report)
     cur_1 = conn_1.cursor()
     postgres_insert_query = """ 
-    insert into "DDS".managers(manager)
+    insert into "CDM".monthly_sales_report(manager)
     SELECT manager  
-    FROM "STG".old_sales
+    FROM "DDS".managers
     """
     cur_1.execute(postgres_insert_query)
     conn_1.commit()
     conn_1.close()
 
-def load_clients_to_dds():
+def load_clients_to_monthly_sales_report():
     # fetching time UTC and table
     fetching_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    current_table = "clients"
+    current_table = "monthly_sales_report"
 
-    # load to local to DB (clients)
+    # load to local to DB (monthly_sales_report)
     cur_1 = conn_1.cursor()
     postgres_insert_query = """ 
-    insert into "DDS".clients(client_id, client, sales_channel, region)
-    SELECT client_id, client, sales_channel, region  
-    FROM "STG".old_sales
-    """
-    postgres_insert_query_2 = """ 
-    insert into "DDS".clients(id_manager)
-    SELECT id_manager  
-    FROM "DDS".managers
-    """                 
-    cur_1.execute(postgres_insert_query)    
-    cur_1.execute(postgres_insert_query_2)  
-    conn_1.commit()
-    conn_1.close()
-
-def load_orders_realizations_to_dds():
-    # fetching time UTC and table
-    fetching_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    current_table = "orders_realizations"
-
-    # load to local to DB (orders_realization)
-    cur_1 = conn_1.cursor()
-    postgres_insert_query = """ 
-    insert into "DDS".orders_realizations(order_date, order_number, realization_date, realization_number, item_number, count, price, total_sum, comment)
-    SELECT order_date, order_number, realization_date, realization_number, item_number, count, price, total_sum, comment  
-    FROM "STG".old_sales
+    insert into "CDM".monthly_sales_report(client)
+    SELECT client  
+    FROM "DDS".clients
     """
     cur_1.execute(postgres_insert_query)    
     conn_1.commit()
     conn_1.close()
 
-def load_sales_to_dds():
+def load_product_category_to_monthly_sales_report():
     # fetching time UTC and table
     fetching_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    current_table = "sales"
+    current_table = "monthly_sales_report"
 
-    # load to local to DB (sales)
+    # load to local to DB (monthly_sales_report)
     cur_1 = conn_1.cursor()
     postgres_insert_query = """ 
-    insert into "DDS".sales(client_id, order_number, realization_number, item_number, count, total_sum)
-    SELECT client_id, order_number, realization_number, item_number, count, total_sum  
-    FROM "STG".old_sales
+    insert into "CDM".monthly_sales_report(brand)
+    SELECT brand  
+    FROM "STG".product_category
     """
-    postgres_insert_query_2 = """ 
-    insert into "DDS".sales(id_manager)
-    SELECT id_manager  
-    FROM "DDS".managers
-    """                 
     cur_1.execute(postgres_insert_query)    
-    cur_1.execute(postgres_insert_query_2)     
     conn_1.commit()
     conn_1.close()
+
+def load_forecast_to_monthly_sales_report():
+    # fetching time UTC and table
+    fetching_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    current_table = "monthly_sales_report"
+
+    # load to local to DB (monthly_sales_report)
+    cur_1 = conn_1.cursor()
+    postgres_insert_query = """ 
+    insert into "CDM".monthly_sales_report(general_plan, week_1, week_2, week_3, week_4, week_5)
+    SELECT general_plan, week_1, week_2, week_3, week_4, week_5  
+    FROM "STG".forecast
+    """
+    cur_1.execute(postgres_insert_query)  
+    conn_1.commit()
+    conn_1.close()
+
+
+
+
+
+
+
+
+
+
 
 default_args = {
     "owner": "airflow",
@@ -118,10 +116,15 @@ with DAG(
 
     # create DAG logic (sequence/order)
     t1 = DummyOperator(task_id="start")
-    t11 = PythonOperator(task_id="managers", python_callable=load_managers_to_dds, dag=dag)
-    t12 = PythonOperator(task_id="clients", python_callable=load_clients_to_dds, dag=dag)
-    t13 = PythonOperator(task_id="orders_realizations", python_callable=load_orders_realizations_to_dds, dag=dag)
-    t14 = PythonOperator(task_id="sales", python_callable=load_sales_to_dds, dag=dag)
+    t11 = PythonOperator(task_id="managers_to", python_callable=load_managers_to_monthly_sales_report, dag=dag)
+    t12 = PythonOperator(task_id="clients_to", python_callable=load_clients_to_monthly_sales_report, dag=dag)
+    t13 = PythonOperator(task_id="product_category_to", python_callable=load_product_category_to_monthly_sales_report, dag=dag)
+    t14 = PythonOperator(task_id="forecast_to", python_callable=load_forecast_to_monthly_sales_report, dag=dag)
+
+
+    
+
+    
     t2 = DummyOperator(task_id="end")
 
     t1 >> t11 >> t12 >> t13 >> t14 >> t2
