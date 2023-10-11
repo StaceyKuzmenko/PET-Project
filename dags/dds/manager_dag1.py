@@ -72,22 +72,22 @@ default_args = {
     "start_date": datetime(2023, 1, 1),
 }
 
-dag = DAG(
-    dag_id="manager_dag1",
-    schedule_interval=None,
-    start_date=pendulum.datetime(2023, 9, 1),
-    catchup=False,
-    tags=["PET-Project", "dds"],
-    is_paused_upon_creation=False,
-)
+with DAG(
+        'manager_dag1',                  
+        default_args=default_args,         
+        schedule_interval=None,  # interval
+        start_date=datetime(2023, 10, 10),  
+        catchup=False,                     
+        tags=['Pet-Project', 'dds'],
+) as dag:
 
-# create DAG logic (sequence/order)
-t1 = DummyOperator(task_id="start")
-t21 = PythonOperator(task_id="managers", python_callable=load_managers_to_dds, dag=dag)
+    # create DAG logic (sequence/order)
+    t1 = DummyOperator(task_id="start")
+    t21 = PythonOperator(task_id="managers", python_callable=load_managers_to_dds, dag=dag)
 #   t22 = PythonOperator(task_id="couriers", python_callable=load_paste_data_couriers, dag=dag)
 #   t23 = PythonOperator(task_id="timestamps", python_callable=load_paste_data_timestamps, dag=dag)
 #   t24 = PythonOperator(task_id="orders", python_callable=load_paste_data_orders, dag=dag)
 #   t25 = PythonOperator(task_id="deliveries", python_callable=load_paste_data_deliveries, dag=dag)
-t4 = DummyOperator(task_id="end")
+    t4 = DummyOperator(task_id="end")
 
-t1 >> t21 >> t4
+    t1 >> t21 >> t4
