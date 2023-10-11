@@ -25,32 +25,43 @@ from typing import Generator
 import psycopg2
 from airflow.hooks.base import BaseHook
 from configparser import ConfigParser
+from .pg_connect import PgConnect
+
 
 ### POSTGRESQL settings ###
 # set postgresql connection from basehook
 # all of these connections should be in Airflow as connectors
 
-#PG_WAREHOUSE_CONNECTION = {
-#    "host": "95.143.191.48",
-#    "user": "project_user",
-#    "password": "project_password",
-#    "port": 5433,
-#    "dbname": "project_db"
-#}
+PG_WAREHOUSE_CONNECTION = {
+    "host": "95.143.191.48",
+    "user": "project_user",
+    "password": "project_password",
+    "port": 5433,
+    "dbname": "project_db"
+}
 
 pg_conn_1 = PostgresHook.get_connection('postgres_db_conn')
 
 # init connection
 # Connect to your local postgres DB (Docker)
-conn_1 = psycopg2.connect(
-    f"""
-    host='95.143.191.48'
-    port='5433'
-    dbname='project_db' 
-    user='project_user' 
-    password='project_password'
-    """
-    )   
+#conn_1 = psycopg2.connect(
+#    f"""
+#    host='95.143.191.48'
+#    port='5433'
+#    dbname='project_db' 
+#    user='project_user' 
+#    password='project_password'
+#    """
+#    )  
+
+dwh_pg_connect = PgConnect(
+    host=PG_WAREHOUSE_CONNECTION["host"],
+    port=PG_WAREHOUSE_CONNECTION["port"],
+    db_name=PG_WAREHOUSE_CONNECTION["database"],
+    user=PG_WAREHOUSE_CONNECTION["user"],
+    pw=PG_WAREHOUSE_CONNECTION["password"],
+    sslmode="require" if PG_WAREHOUSE_CONNECTION["ssl"] else "disable"
+)
 
 # load data from STG
 # paste data to DDS local connection
