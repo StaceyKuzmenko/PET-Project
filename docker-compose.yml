@@ -63,6 +63,7 @@ x-airflow-common:
     - /opt/compose/config:/opt/airflow/config
     - /opt/compose/plugins:/opt/airflow/plugins
     - /opt/compose/files_dir:/opt/airflow/files_dir
+    - shared_fs:/opt/airflow/plugins/files_dir:rw
     #- /opt/compose/airflow.cfg:/opt/airflow/airflow.cfg
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
@@ -85,6 +86,7 @@ services:
       - "5433:5432"
     volumes:
       - postgres_database:/var/lib/postgresql/data:rw
+      - shared_fs:/opt:rw
     healthcheck:
       test: ["CMD", "pg_isready", "-q", "-d", "project_db"]
       interval: 10s
@@ -130,6 +132,7 @@ services:
     - /opt/compose/config:/opt/airflow/config
     - /opt/compose/plugins:/opt/airflow/plugins
     - /opt/compose/files_dir:/opt/airflow/files_dir
+    - shared_fs:/opt/airflow/plugins/files_dir:rw
     expose:
       - "8080"
     ports:
@@ -329,5 +332,6 @@ services:
 volumes:
   postgres_database:
   postgres:
+  shared_fs:
   #airflow-webserver:
 
