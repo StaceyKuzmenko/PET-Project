@@ -33,11 +33,11 @@ def get_files_from_ftp(folder_list:list, host, user:str, passwd:str):
             #for debugging printing all files dates
             print ('found date >>>', datetime.strptime(modified_time[4:], "%Y%m%d%H%M%S").strftime("%d %B %Y %H:%M:%S"))
 
-        #name and date of the latest file in a folder
-        print(f'{latest_name} -  {datetime.strptime(latest_time[4:], "%Y%m%d%H%M%S").strftime("%d %B %Y %H:%M:%S")}')
-
+        #creating a new name for the file in format yyyymmdd
+        new_file_name = f'{folder}-{latest_time[4:]}'
+        
         #copying the file to the local folder
-        file_name_with_full_path_to_local_folder = os.path.join('/', 'opt', 'airflow', 'plugins', 'files_dir', folder, latest_name)
+        file_name_with_full_path_to_local_folder = os.path.join('/', 'opt', 'airflow', 'plugins', 'files_dir', folder, new_file_name)
         with open(file_name_with_full_path_to_local_folder, 'wb') as f:
             ftp.retrbinary('RETR '+ latest_name, f.write)
     
