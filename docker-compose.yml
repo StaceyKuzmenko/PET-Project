@@ -86,7 +86,7 @@ services:
       - "5433:5432"
     volumes:
       - postgres_database:/var/lib/postgresql/data:rw
-      #- shared_fs:/opt:rw
+      - /opt/compose/plugins:/opt:r
     healthcheck:
       test: ["CMD", "pg_isready", "-q", "-d", "project_db"]
       interval: 10s
@@ -332,6 +332,6 @@ services:
 volumes:
   postgres_database:
   postgres:
-  shared_fs:
+  #shared_fs:
   #airflow-webserver:
 
