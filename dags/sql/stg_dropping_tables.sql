@@ -20,7 +20,6 @@ CREATE TABLE "STG".test_sales (
 	"comment" varchar NULL
 );
 
-
 DROP TABLE IF EXISTS "STG".test_category;
 CREATE TABLE "STG".test_category (
 	item_number varchar NOT NULL,
@@ -42,6 +41,3 @@ CREATE TABLE "STG".test_forecast (
 	week_4 numeric(14, 2) NULL,
 	week_5 numeric(14, 2) NULL
 );
-
---copy "STG".test_new_sales 
---from '/opt/airflow/plugins/files_dir/sales/sales\ 01.01.2023\ -\ 07.09.2023_233954_test.csv';

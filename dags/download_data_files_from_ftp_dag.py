@@ -1,5 +1,6 @@
 import datetime
 from library.ftp_download import get_files_from_ftp
+from library.managing_files import find_the_latest_local_file_by_name
 
 from airflow import DAG
 from airflow.operators.empty import EmptyOperator
@@ -40,10 +41,20 @@ with DAG(
     drop_stg_tables = PostgresOperator(
         task_id="stg_dropping_tables",
         postgres_conn_id="postgres_local",
-        sql="sql/stg_dropping_tables.sql",
-        #params={"folder": folder},
+        sql="sql/stg_dropping_tables.sql"
 )
-
+    
+    def create_loading_tasks(folder_name):
+        latest_file = find_the_latest_local_file_by_name(folder_name)
+        return PostgresOperator(
+        task_id=f"stg_loading_table_{folder_name}",
+        postgres_conn_id="postgres_local",
+        sql=f"sql/stg_load_tables.sql",
+        params={"folder": folder_name, "latest_file": latest_file})
+    
+    for folder in folders:
+        dynamic_task = create_loading_tasks(folder)
+        
 (
-    download_files >> drop_stg_tables
+    download_files >> drop_stg_tables >> dynamic_task
 )
