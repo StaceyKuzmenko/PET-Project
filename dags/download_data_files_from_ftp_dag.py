@@ -4,6 +4,7 @@ from library.ftp_download import get_files_from_ftp
 from airflow import DAG
 from airflow.operators.empty import EmptyOperator
 from airflow.operators.python import PythonOperator
+from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.hooks.base import BaseHook
 
 conn = BaseHook.get_connection('ftp_conn')
@@ -35,7 +36,14 @@ with DAG(
                    'user': conn.login,
                    'passwd': conn.password
                    })
+    
+    drop_stg_tables = PostgresOperator(
+        task_id="stg_dropping_tables",
+        postgres_conn_id="postgres_local",
+        sql="sql/birth_date.sql",
+        #params={"folder": folder},
+)
 
 (
-    download_files
+    download_files >> drop_stg_tables
 )

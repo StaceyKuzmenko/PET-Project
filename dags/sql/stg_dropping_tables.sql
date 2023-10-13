@@ -22,5 +22,5 @@ CREATE TABLE "STG".test_new_sales (
 	"comment" varchar NULL
 );
 
-copy "STG".test_new_sales 
-from '/opt/airflow/plugins/files_dir/sales/sales\ 01.01.2023\ -\ 07.09.2023_233954_test.csv';
+--copy "STG".test_new_sales 
+--from '/opt/airflow/plugins/files_dir/sales/sales\ 01.01.2023\ -\ 07.09.2023_233954_test.csv';
