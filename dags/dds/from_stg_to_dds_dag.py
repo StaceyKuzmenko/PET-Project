@@ -17,8 +17,7 @@ from airflow.utils.task_group import TaskGroup
 DB_NAME = "project_db"
 DB_USER = "project_user"
 DB_PASS = "project_password"
-#DB_HOST = "95.143.191.48"
-DB_HOST = postgres_local
+DB_HOST = "95.143.191.48"
 DB_PORT = "5433"
 
 conn_1 = psycopg2.connect(
