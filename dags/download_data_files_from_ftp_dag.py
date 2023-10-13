@@ -40,7 +40,7 @@ with DAG(
     drop_stg_tables = PostgresOperator(
         task_id="stg_dropping_tables",
         postgres_conn_id="postgres_local",
-        sql="sql/birth_date.sql",
+        sql="sql/stg_dropping_tables.sql",
         #params={"folder": folder},
 )
 
