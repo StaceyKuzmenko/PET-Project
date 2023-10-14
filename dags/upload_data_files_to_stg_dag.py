@@ -10,7 +10,7 @@ from airflow.hooks.base import BaseHook
 
 conn = BaseHook.get_connection('ftp_conn')
 folders = ('forecast', 'category', 'sales')
-latest_file = find_the_latest_local_file_by_name(folders[0])
+latest_file = find_the_latest_local_file_by_name(folders)
 
 args = {
     "owner": "PET",
