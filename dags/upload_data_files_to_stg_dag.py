@@ -44,7 +44,6 @@ with DAG(
             task_id=f"stg_loading_table_{folder}",
             postgres_conn_id="postgres_local",
             sql=f"copy \"STG\".test_{folder} from '{latest_file}' with (format csv, delimiter \";\", header);"
-            #params={"folder": folder, "latest_file": latest_file})
             )
 
 

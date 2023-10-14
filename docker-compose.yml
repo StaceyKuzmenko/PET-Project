@@ -62,9 +62,7 @@ x-airflow-common:
     - /opt/compose/logs:/opt/airflow/logs
     - /opt/compose/config:/opt/airflow/config
     - /opt/compose/plugins:/opt/airflow/plugins
-    - /opt/compose/files_dir:/opt/airflow/files_dir
-    #- shared_fs:/opt/airflow/plugins/files_dir:rw
-    #- /opt/compose/airflow.cfg:/opt/airflow/airflow.cfg
+    #- /opt/compose/files_dir:/opt/airflow/files_dir
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -131,7 +129,7 @@ services:
     - /opt/compose/logs:/opt/airflow/logs
     - /opt/compose/config:/opt/airflow/config
     - /opt/compose/plugins:/opt/airflow/plugins
-    - /opt/compose/files_dir:/opt/airflow/files_dir
+    #- /opt/compose/files_dir:/opt/airflow/files_dir
     #- shared_fs:/opt/airflow/plugins/files_dir:rw
     expose:
       - "8080"
