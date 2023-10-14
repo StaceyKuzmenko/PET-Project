@@ -39,6 +39,7 @@ with DAG(
     with loading_sql_tasks:
         for folder in folders:
             latest_file = find_the_latest_local_file_by_name(folder)
+            print("=========>>>", latest_file)
             PostgresOperator(
             task_id=f"stg_loading_table_{folder}",
             postgres_conn_id="postgres_local",
