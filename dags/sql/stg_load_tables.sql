@@ -1,2 +1,2 @@
-copy "STG".test_{{ params.folder }} 
-from '{{ params.latest_file }}';
+copy "STG".test_{{ parameters.folder }} 
+from '{{ parameters.latest_file }}';
