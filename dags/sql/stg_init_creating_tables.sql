@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS "STG".test_sales;
-CREATE TABLE "STG".test_sales (
+--DROP TABLE IF EXISTS "STG".test_sales;
+CREATE TABLE "STG".sales (
 	manager_id int4 NULL,
 	manager varchar NULL,
 	client_id varchar NOT NULL,
@@ -20,16 +20,16 @@ CREATE TABLE "STG".test_sales (
 	"comment" varchar NULL
 );
 
-DROP TABLE IF EXISTS "STG".test_category;
-CREATE TABLE "STG".test_category (
+--DROP TABLE IF EXISTS "STG".test_category;
+CREATE TABLE "STG".category (
 	item_number varchar NOT NULL,
 	product_name varchar NOT NULL,
 	brand varchar NOT NULL,
 	product_category varchar NULL
 );
 
-DROP TABLE IF EXISTS "STG".test_forecast;
-CREATE TABLE "STG".test_forecast (
+--DROP TABLE IF EXISTS "STG".test_forecast;
+CREATE TABLE "STG".forecast (
 	manager varchar NOT NULL,
 	client_id varchar NOT NULL,
 	client varchar NOT NULL,

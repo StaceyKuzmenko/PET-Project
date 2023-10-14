@@ -22,24 +22,32 @@ args = {
 
 
 with DAG(
-    dag_id="download_files_from_ftp_to_local_folders",
+    dag_id="upload_files_to_stg_layer",
     start_date=datetime.datetime(2023, 10, 5),
-    description='Download 3 most recent files from data folders',
+    description='Upload 3 files to STG-layer',
     schedule="@daily",
     catchup=False,
     max_active_runs=1
 ) as dag:
 
-    download_files = PythonOperator(
-        task_id='downloading_files',
-        python_callable= get_files_from_ftp,
-        op_kwargs={'folder_list': folders,
-                   'host': conn.host,
-                   'user': conn.login,
-                   'passwd': conn.password
-                   })
+    clear_stg_tables = PostgresOperator(
+        task_id="stg_clearing_tables",
+        postgres_conn_id="postgres_local",
+        sql="sql/stg_clearing_tables.sql"
+)
+
+    def create_loading_tasks(folder_name, latest_file):
+        return PostgresOperator(
+            task_id=f"stg_loading_table_{folder_name}",
+            postgres_conn_id="postgres_local",
+            sql=f"sql/stg_load_tables.sql",
+            parameters={"folder": folder_name, "latest_file": latest_file})
     
+    for folder in folders:
+        latest_file = find_the_latest_local_file_by_name(folder)
+        dynamic_task = create_loading_tasks(folder, latest_file)
+        
 
 (
-    download_files
+    clear_stg_tables >> dynamic_task
 )
