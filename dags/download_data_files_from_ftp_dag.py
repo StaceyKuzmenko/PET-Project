@@ -10,6 +10,7 @@ from airflow.hooks.base import BaseHook
 
 conn = BaseHook.get_connection('ftp_conn')
 folders = ('forecast', 'category', 'sales')
+latest_file = find_the_latest_local_file_by_name(folders[0])
 
 args = {
     "owner": "PET",
@@ -43,8 +44,13 @@ with DAG(
         postgres_conn_id="postgres_local",
         sql="sql/stg_dropping_tables.sql"
 )
-    
-    def create_loading_tasks(folder_name, latest_file):
+    task_to_try = PostgresOperator(
+            task_id=f"stg_loading_table_{folders[0]}",
+            postgres_conn_id="postgres_local",
+            sql=f"sql/stg_load_tables.sql",
+            parameters={"folder": folders[0], "latest_file": latest_file})
+
+    '''def create_loading_tasks(folder_name, latest_file):
         return PostgresOperator(
             task_id=f"stg_loading_table_{folder_name}",
             postgres_conn_id="postgres_local",
@@ -55,6 +61,8 @@ with DAG(
         latest_file = find_the_latest_local_file_by_name(folder)
         dynamic_task = create_loading_tasks(folder, latest_file)
         
+'''
+
 (
-    download_files >> drop_stg_tables >> dynamic_task
+    download_files >> drop_stg_tables >> task_to_try
 )
