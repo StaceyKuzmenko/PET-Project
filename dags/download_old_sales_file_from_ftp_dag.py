@@ -7,7 +7,7 @@ from airflow.operators.python import PythonOperator
 from airflow.hooks.base import BaseHook
 
 conn = BaseHook.get_connection('ftp_conn')
-folders = ('old_sales')
+folders = ('old_sales',)
 
 args = {
     "owner": "PET",
