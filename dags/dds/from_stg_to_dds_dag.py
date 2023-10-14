@@ -34,9 +34,14 @@ def load_managers_to_dds():
     # load to local to DB (managers)
     cur_1 = conn_1.cursor()
     postgres_insert_query = """ 
-    insert into "DDS".managers(manager)
-    SELECT distinct manager  
-    FROM "STG".old_sales;
+    INSERT INTO "DDS".managers(manager)
+    SELECT DISTINCT manager  
+    FROM "STG".old_sales
+    WHERE NOT EXISTS (
+		SELECT 1
+		FROM "DDS".managers
+		WHERE "DDS".managers.manager = "STG".old_sales.manager 
+);
     """
     cur_1.execute(postgres_insert_query)
     conn_1.commit()
@@ -50,9 +55,21 @@ def load_clients_to_dds():
     # load to local to DB (clients)
     cur_1 = conn_1.cursor()
     postgres_insert_query = """ 
-    insert into "DDS".clients(id_manager, client_id, client, sales_channel, region)
-    SELECT m.id, os.client_id, os.client, os.sales_channel, os.region 
-    FROM "DDS".managers as m, "STG".old_sales as os;
+    INSERT INTO "DDS".clients(client_id, client, manager_id, sales_channel, region)
+    SELECT DISTINCT os.client_id,
+           os.client,
+           m.id AS manager_id,
+           os.sales_channel,
+           os.region 
+    FROM "STG".old_sales AS os 
+    LEFT JOIN "DDS".clients AS c using(client_id) 
+    LEFT JOIN "DDS".managers AS m using(manager)
+    WHERE NOT EXISTS (
+		SELECT 1
+		FROM "DDS".clients
+		WHERE "DDS".clients.client_id = os.client_id 
+)
+;
     """
     cur_1.execute(postgres_insert_query)    
     conn_1.commit()
@@ -66,26 +83,33 @@ def load_orders_realizations_to_dds():
     # load to local to DB (orders_realization)
     cur_1 = conn_1.cursor()
     postgres_insert_query = """ 
-    insert into "DDS".orders_realizations(order_date, order_number, realization_date, realization_number, item_number, count, price, total_sum, comment)
-    SELECT to_date(order_date, 'DD-MM-YYYY'), order_number, to_date(realization_date, 'DD-MM-YYYY'), realization_number, item_number, count, price, total_sum, comment  
-    FROM "STG".old_sales
+    TRUNCATE "DDS".orders_realizations;
+    INSERT INTO "DDS".orders_realizations(
+	client_id, 
+	order_date, 
+	order_number, 
+	realization_date, 
+	realization_number, 
+	item_number, 
+	count, 
+	price, 
+	total_sum, 
+	comment)
+    	SELECT 
+    		c.id as client_id, 
+    		to_date(os.order_date, 'DD-MM-YYYY'), 
+    		os.order_number, 
+    		to_date(os.realization_date, 'DD-MM-YYYY'), 
+    		os.realization_number, 
+    		os.item_number, 
+    		os.count, 
+    		os.price, 
+    		os.total_sum, 
+    		os.comment  
+	    FROM "STG".old_sales as os
+	    left join "DDS".clients as c using(client_id)	    
+;
     """
-    cur_1.execute(postgres_insert_query)    
-    conn_1.commit()
-    conn_1.close()
-
-def load_sales_to_dds():
-    # fetching time UTC and table
-    fetching_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    current_table = "sales"
-
-    # load to local to DB (sales)
-    cur_1 = conn_1.cursor()
-    postgres_insert_query = """ 
-    insert into "DDS".sales(id_manager, client_id, order_number, realization_number, item_number, count, total_sum)
-    SELECT m.id, os.client_id, os.order_number, os.realization_number, os.item_number, os.count, os.total_sum 
-    FROM "DDS".managers as m, "STG".old_sales as os;
-        """
     cur_1.execute(postgres_insert_query)    
     conn_1.commit()
     conn_1.close()
@@ -109,7 +133,6 @@ with DAG(
     t11 = PythonOperator(task_id="managers", python_callable=load_managers_to_dds, dag=dag)
     t12 = PythonOperator(task_id="clients", python_callable=load_clients_to_dds, dag=dag)
     t13 = PythonOperator(task_id="orders_realizations", python_callable=load_orders_realizations_to_dds, dag=dag)
-    t14 = PythonOperator(task_id="sales", python_callable=load_sales_to_dds, dag=dag)
     t2 = DummyOperator(task_id="end")
 
-    t1 >> t11 >> t12 >> t13 >> t14 >> t2
+    t1 >> t11 >> t12 >> t13 >> t2
