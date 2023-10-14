@@ -1,5 +1,4 @@
 import datetime
-from library.ftp_download import get_files_from_ftp
 from library.managing_files import find_the_latest_local_file_by_name
 
 from airflow import DAG
