@@ -3,10 +3,9 @@ from library.ftp_download import get_files_from_ftp
 from library.managing_files import find_the_latest_local_file_by_name
 
 from airflow import DAG
-from airflow.operators.empty import EmptyOperator
-from airflow.operators.python import PythonOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.hooks.base import BaseHook
+from airflow.utils.task_group import TaskGroup
 
 conn = BaseHook.get_connection('ftp_conn')
 folders = ('forecast', 'category', 'sales')
@@ -35,18 +34,18 @@ with DAG(
         sql="sql/stg_clearing_tables.sql"
 )
 
-    def create_loading_tasks(folder_name, latest_file):
-        return PostgresOperator(
-            task_id=f"stg_loading_table_{folder_name}",
+    loading_sql_tasks = TaskGroup('load_files_to_stg')
+    
+    with loading_sql_tasks:
+        for folder in folders:
+            latest_file = find_the_latest_local_file_by_name(folder)
+            PostgresOperator(
+            task_id=f"stg_loading_table_{folder}",
             postgres_conn_id="postgres_local",
             sql=f"sql/stg_load_tables.sql",
-            params={"folder": folder_name, "latest_file": latest_file})
-    
-    for folder in folders:
-        latest_file = find_the_latest_local_file_by_name(folder)
-        dynamic_task = create_loading_tasks(folder, latest_file)
-        
+            params={"folder": folder, "latest_file": latest_file})
+
 
 (
-    clear_stg_tables >> dynamic_task
+    clear_stg_tables >> loading_sql_tasks
 )
