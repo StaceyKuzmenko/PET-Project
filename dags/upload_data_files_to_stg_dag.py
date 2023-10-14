@@ -40,7 +40,7 @@ with DAG(
             task_id=f"stg_loading_table_{folder_name}",
             postgres_conn_id="postgres_local",
             sql=f"sql/stg_load_tables.sql",
-            parameters={"folder": folder_name, "latest_file": latest_file})
+            params={"folder": folder_name, "latest_file": latest_file})
     
     for folder in folders:
         latest_file = find_the_latest_local_file_by_name(folder)
