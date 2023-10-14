@@ -30,7 +30,7 @@ with DAG(
     clear_stg_tables = PostgresOperator(
         task_id="stg_clearing_table",
         postgres_conn_id="postgres_local",
-        sql="TRUNCATE TABLE "STG".test_old_sales;"
+        sql="TRUNCATE TABLE \"STG\".test_old_sales;"
 )
 
     loading_sql_tasks = TaskGroup('load_files_to_stg')
