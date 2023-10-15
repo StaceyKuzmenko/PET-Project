@@ -23,7 +23,7 @@ with DAG(
     description='Download 3 most recent files from data folders',
     schedule="@daily",
     catchup=False,
-    tags=['ftp', '>>>', 'local'],
+    tags=['ftp'],
     max_active_runs=1
 ) as dag:
 

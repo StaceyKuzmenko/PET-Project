@@ -24,7 +24,7 @@ with DAG(
     description='Upload old_sales file to STG-layer',
     schedule=None,
     catchup=False,
-    tags=['local', '>>>', 'stg'],
+    tags=['stg'],
     max_active_runs=1
 ) as dag:
 
