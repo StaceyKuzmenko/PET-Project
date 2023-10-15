@@ -16,7 +16,7 @@ args = {
     'retries': 2
 }
 
-execution_times = ["4:05", "09:05", "13:05"] # <<< this is in UTC (in UTC +3 07:05; 12:05; 16:05)
+execution_times = ["04 05", "09 05", "13 05"] # <<< this is in UTC (in UTC +3 07:05; 12:05; 16:05)
 
 with DAG(
     dag_id="download_files_from_ftp_to_local_folders",
