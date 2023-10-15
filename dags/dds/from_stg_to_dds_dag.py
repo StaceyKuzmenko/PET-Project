@@ -42,6 +42,14 @@ def load_managers_to_dds():
 		FROM "DDS".managers
 		WHERE "DDS".managers.manager = "STG".old_sales.manager 
 );
+    INSERT INTO "DDS".managers(manager)
+    SELECT DISTINCT manager  
+    FROM "STG".sales
+    WHERE NOT EXISTS (
+		SELECT 1
+		FROM "DDS".managers
+		WHERE "DDS".managers.manager = "STG".sales.manager 
+);
     """
     cur_1.execute(postgres_insert_query)
     conn_1.commit()
@@ -68,6 +76,21 @@ def load_clients_to_dds():
 		SELECT 1
 		FROM "DDS".clients
 		WHERE "DDS".clients.client_id = os.client_id 
+)
+;
+    INSERT INTO "DDS".clients(client_id, client, manager_id, sales_channel, region)
+    SELECT DISTINCT s.client_id,
+           s.client,
+           m.id AS manager_id,
+           s.sales_channel,
+           s.region 
+    FROM "STG".sales AS s 
+    LEFT JOIN "DDS".clients AS c using(client_id) 
+    LEFT JOIN "DDS".managers AS m using(manager)
+    WHERE NOT EXISTS (
+		SELECT 1
+		FROM "DDS".clients
+		WHERE "DDS".clients.client_id = s.client_id 
 )
 ;
     """
@@ -107,6 +130,31 @@ def load_orders_realizations_to_dds():
     		os.total_sum, 
     		os.comment  
 	    FROM "STG".old_sales as os
+	    left join "DDS".clients as c using(client_id)	    
+;
+    INSERT INTO "DDS".orders_realizations(
+	client_id, 
+	order_date, 
+	order_number, 
+	realization_date, 
+	realization_number, 
+	item_number, 
+	count, 
+	price, 
+	total_sum, 
+	comment)
+    	SELECT 
+    		c.id as client_id, 
+    		to_date(s.order_date, 'DD-MM-YYYY'), 
+    		s.order_number, 
+    		to_date(s.realization_date, 'DD-MM-YYYY'), 
+    		s.realization_number, 
+    		s.item_number, 
+    		s.count, 
+    		s.price, 
+    		s.total_sum, 
+    		s.comment  
+	    FROM "STG".sales as s
 	    left join "DDS".clients as c using(client_id)	    
 ;
     """
