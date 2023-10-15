@@ -22,7 +22,7 @@ with DAG(
     dag_id="download_files_from_ftp_to_local_folders",
     start_date=datetime.datetime(2023, 10, 5),
     description='Download 3 most recent files from data folders',
-    schedule=None,
+    schedule="@daily",
     catchup=False,
     tags=['ftp'],
     max_active_runs=1
