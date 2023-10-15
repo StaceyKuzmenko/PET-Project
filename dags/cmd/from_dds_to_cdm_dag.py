@@ -128,3 +128,5 @@ with DAG(
     t2 = DummyOperator(task_id="end")
 
     t1 >> t11 >> t12 >> t13 >> t14 >> t2
+
+conn_1.close()
