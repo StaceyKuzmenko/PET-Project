@@ -24,6 +24,7 @@ with DAG(
     description='Upload 3 files to STG-layer',
     schedule="@daily",
     catchup=False,
+    tags=['local', '>>>', 'stg'],
     max_active_runs=1
 ) as dag:
 

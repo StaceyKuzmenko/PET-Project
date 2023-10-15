@@ -24,7 +24,8 @@ with DAG(
     description='Download old_sales file from ftp',
     schedule=None,
     catchup=False,
-    max_active_runs=1
+    max_active_runs=1,
+    tags=['ftp', '>>>', 'local']
 ) as dag:
 
     download_files = PythonOperator(
