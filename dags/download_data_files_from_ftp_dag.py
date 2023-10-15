@@ -23,7 +23,7 @@ with DAG(
     start_date=datetime.datetime(2023, 10, 5),
     description='Download 3 most recent files from data folders',
     #schedule="@daily",
-    schedule_interval = None,
+    #schedule_interval = None,
     catchup=False,
     tags=['ftp'],
     max_active_runs=1
