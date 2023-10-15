@@ -16,14 +16,14 @@ args = {
     'retries': 2
 }
 
-#execution_times = ["04 05", "09 05", "13 05"] # <<< this is in UTC (in UTC +3 07:05; 12:05; 16:05)
+execution_times = ["5 4", "5 9", "5 13"] # <<< this is in UTC (in UTC +3 07:05; 12:05; 16:05)
 
 with DAG(
     dag_id="download_files_from_ftp_to_local_folders",
     start_date=datetime.datetime(2023, 10, 5),
     description='Download 3 most recent files from data folders',
-    schedule="@daily",
-    schedule_interval = '5 4,9,13 * * *',
+    #schedule="@daily",
+    schedule_interval = None,
     catchup=False,
     tags=['ftp'],
     max_active_runs=1
@@ -38,10 +38,9 @@ with DAG(
                    'passwd': conn.password
                    })
     
-'''    for time in execution_times:
+    for time in execution_times:
         dag.schedule_interval = f'{time} * * *'
-        '''
-
+    
 (
     download_files
 )
