@@ -185,8 +185,9 @@ with DAG(
     t13 = PythonOperator(task_id="orders_realizations", python_callable=load_orders_realizations_to_dds, dag=dag)
     t2 = DummyOperator(task_id="end")
 
-    t1 >> t11 >> t12 >> t13 >> t2
-
     '''for time in execution_times:
     dag.schedule_interval = f'{time} * * *'
     '''
+	
+    t1 >> t11 >> t12 >> t13 >> t2
+
