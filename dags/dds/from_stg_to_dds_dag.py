@@ -164,14 +164,14 @@ def load_orders_realizations_to_dds():
 
 default_args = {
     "owner": "airflow",
-    "start_date": datetime(2017, 1, 1),
+    "start_date": datetime(2023, 10, 16),
 }
 
 with DAG(
         'from_stg_to_dds_dag',                  
         default_args=default_args,         
-        schedule_interval=None,  
-        start_date=datetime(2017, 1, 1),  
+        schedule_interval="15 4,9,13 * * *",  
+        start_date=datetime(2023, 10, 16),  
         catchup=False,                     
         tags=['Pet-Project', 'stg', 'dds'],
 ) as dag:
