@@ -38,9 +38,6 @@ with DAG(
                    'passwd': conn.password
                    })
     
-'''for time in execution_times:
-    dag.schedule_interval = f'{time} * * *'
-    '''
 (
     download_files
 )

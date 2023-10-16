@@ -22,7 +22,8 @@ with DAG(
     dag_id="upload_files_to_stg_layer",
     start_date=datetime.datetime(2023, 10, 5),
     description='Upload 3 files to STG-layer',
-    schedule="@daily",
+    #schedule="@daily",
+    schedule_interval = '10 4,9,13 * * *', # <<< this is in UTC (in UTC +3 07:05; 12:05; 16:05)
     catchup=False,
     tags=['stg'],
     max_active_runs=1
