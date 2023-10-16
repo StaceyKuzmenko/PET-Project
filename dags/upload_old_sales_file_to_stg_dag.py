@@ -34,6 +34,7 @@ with DAG(
         postgres_conn_id="postgres_local",
         sql="TRUNCATE TABLE \"STG\".test_old_sales;"
 )
+    
     upload_old_sales_to_stg = PostgresOperator(
     task_id=f"stg_loading_table_old_sales",
     postgres_conn_id="postgres_local",

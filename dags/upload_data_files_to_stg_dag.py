@@ -35,6 +35,7 @@ with DAG(
         sql="sql/stg_clearing_tables.sql"
 )
 
+
     loading_sql_tasks = TaskGroup('load_files_to_stg')
     
 
