@@ -102,14 +102,14 @@ def load_forecast_to_monthly_sales_report():
 
 default_args = {
     "owner": "airflow",
-    "start_date": datetime(2023, 1, 1),
+    "start_date": datetime(2023, 10, 16),
 }
 
 with DAG(
         'from_dds_to_cdm_dag',                  
         default_args=default_args,         
-        schedule_interval=None,  
-        start_date=datetime(2023, 10, 10),  
+        schedule_interval="20 4,9,13 * * *",  
+        start_date=datetime(2023, 10, 16),  
         catchup=False,                     
         tags=['Pet-Project', 'dds', 'cdm'],
 ) as dag:
