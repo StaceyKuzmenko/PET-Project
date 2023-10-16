@@ -167,10 +167,12 @@ default_args = {
     "start_date": datetime(2023, 10, 16),
 }
 
+execution_times = ["15 4", "15 9", "15 13"] # <<< this is in UTC (in UTC +3 07:15; 12:15; 16:15)
+
 with DAG(
         'from_stg_to_dds_dag',                  
         default_args=default_args,         
-        schedule_interval="15 4,9,13 * * *",  
+        schedule_interval='15 4,9,13 * * *',  
         start_date=datetime(2023, 10, 16),  
         catchup=False,                     
         tags=['Pet-Project', 'stg', 'dds'],
@@ -184,5 +186,7 @@ with DAG(
     t2 = DummyOperator(task_id="end")
 
     t1 >> t11 >> t12 >> t13 >> t2
-	
-conn_1.close()
+
+    '''for time in execution_times:
+    dag.schedule_interval = f'{time} * * *'
+    '''
