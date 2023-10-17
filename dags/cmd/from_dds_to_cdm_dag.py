@@ -81,10 +81,10 @@ def load_to_current_month_aggregated_sales():
     # load to local to DB (current_month_aggregated_sales)
     cur_1 = conn_1.cursor()
     postgres_insert_query = """ 
-    truncate "CDM".current_month_aggregated_sales;
+    truncate "CDM".current_month_aggregated_sales ;
     insert into "CDM".current_month_aggregated_sales(manager, client, subbrand, orders_sum, realizations_sum)
     with a as (
-	    select
+	select
 		distinct or2.client_id,
 		c.subbrand,
 		case
@@ -95,22 +95,22 @@ def load_to_current_month_aggregated_sales():
 			when or2.realization_number is not null and or2.realization_number != '' then sum(or2.total_sum)
 			else null
 		end as realizations_sum
-	    from "DDS".orders_realizations or2
+	from "DDS".orders_realizations or2
 	left join "STG".category as c using(item_number)
-	    where to_char(or2.order_date, 'YYYY-MM') = '2023-09'
-	    group by or2.client_id, c.subbrand, or2.realization_number
+	where to_char(or2.order_date, 'YYYY-MM') = '2023-09'
+	group by or2.client_id, c.subbrand, or2.realization_number
 	),
     b as (
-	    select
+	select
 		c2.manager_id,
 		a.client_id,
 		c2.client,
 		a.subbrand,
 		sum(a.orders_sum) as orders_sum,
 		sum(a.realizations_sum) as realizations_sum
-	    from a
-	    join "DDS".clients c2 on a.client_id=c2.id
-	    group by a.client_id, c2.client, c2.manager_id, a.subbrand
+	from a
+	left join "DDS".clients c2 on a.client_id=c2.id
+	group by a.client_id, c2.client, c2.manager_id, a.subbrand
     )
 	select
 		m.manager,
