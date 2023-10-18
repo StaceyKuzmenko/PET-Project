@@ -1,3 +1,4 @@
 TRUNCATE TABLE "STG".sales;
 TRUNCATE TABLE "STG".category;
 TRUNCATE TABLE "STG".forecast;
+TRUNCATE TABLE "STG".marketplaces;
