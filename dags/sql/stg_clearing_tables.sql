@@ -1,3 +1,3 @@
-TRUNCATE TABLE "STG".test_sales;
-TRUNCATE TABLE "STG".test_category;
-TRUNCATE TABLE "STG".test_forecast;
+TRUNCATE TABLE "STG".sales;
+TRUNCATE TABLE "STG".category;
+TRUNCATE TABLE "STG".forecast;

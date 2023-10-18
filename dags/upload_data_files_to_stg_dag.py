@@ -45,7 +45,7 @@ with DAG(
             PostgresOperator(
             task_id=f"stg_loading_table_{folder}",
             postgres_conn_id="postgres_local",
-            sql=f"copy \"STG\".test_{folder} from '{latest_file}' with (format csv, delimiter \";\", header);"
+            sql=f"copy \"STG\".{folder} from '{latest_file}' with (format csv, delimiter \";\", header);"
             )
 
 

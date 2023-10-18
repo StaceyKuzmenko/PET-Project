@@ -32,13 +32,13 @@ with DAG(
     clear_stg_tables = PostgresOperator(
         task_id="stg_clearing_table",
         postgres_conn_id="postgres_local",
-        sql="TRUNCATE TABLE \"STG\".test_old_sales;"
+        sql="TRUNCATE TABLE \"STG\".old_sales;"
 )
     
     upload_old_sales_to_stg = PostgresOperator(
     task_id=f"stg_loading_table_old_sales",
     postgres_conn_id="postgres_local",
-    sql=f"copy \"STG\".test_old_sales from '{latest_file}' with (format csv, delimiter \";\", header);"
+    sql=f"copy \"STG\".old_sales from '{latest_file}' with (format csv, delimiter \";\", header);"
     )
 
 
