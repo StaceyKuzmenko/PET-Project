@@ -125,7 +125,7 @@ def load_orders_realizations_to_dds():
     		to_date(os.realization_date, 'DD-MM-YYYY'), 
     		os.realization_number, 
     		os.item_number, 
-    		os.CAST(count AS double precision), 
+    		os.CAST(count AS float8), 
     		os.price, 
     		os.total_sum, 
     		os.comment  
@@ -150,7 +150,7 @@ def load_orders_realizations_to_dds():
     		to_date(s.realization_date, 'DD-MM-YYYY'), 
     		s.realization_number, 
     		s.item_number, 
-    		s.CAST(count AS double precision), 
+    		s.CAST(count AS float8), 
     		s.price, 
     		s.total_sum, 
     		s.comment  
