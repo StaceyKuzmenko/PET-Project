@@ -7,7 +7,7 @@ from airflow.hooks.base import BaseHook
 from airflow.utils.task_group import TaskGroup
 
 conn = BaseHook.get_connection('ftp_conn')
-folders = ('forecast', 'category', 'sales')
+folders = ('forecast', 'category', 'sales', 'marketplaces')
 
 args = {
     "owner": "PET",
