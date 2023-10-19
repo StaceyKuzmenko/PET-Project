@@ -118,7 +118,7 @@ def load_orders_realizations_to_dds():
 	price, 
 	total_sum, 
 	comment)
-    	SELECT 
+    	SELECT  
     		c.id as client_id, 
     		to_date(os.order_date, 'DD-MM-YYYY'), 
     		os.order_number, 
