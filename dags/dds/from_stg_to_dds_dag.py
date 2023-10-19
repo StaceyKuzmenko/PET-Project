@@ -126,7 +126,7 @@ def load_orders_realizations_to_dds():
     		os.realization_number, 
     		os.item_number, 
     		os.count, 
-    		os.price, 
+    		replace(os.price)::float8, 
     		os.total_sum, 
     		os.comment  
 	    FROM "STG".old_sales as os
@@ -151,7 +151,7 @@ def load_orders_realizations_to_dds():
     		s.realization_number, 
     		s.item_number, 
     		s.count, 
-    		s.price, 
+    		replace(s.price)::float8, 
     		s.total_sum, 
     		s.comment  
 	    FROM "STG".sales as s
