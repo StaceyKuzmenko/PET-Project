@@ -17,7 +17,7 @@ from airflow.utils.task_group import TaskGroup
 DB_NAME = "project_db"
 DB_USER = "project_user"
 DB_PASS = "project_password"
-DB_HOST = "95.143.191.48"
+DB_HOST = "91.107.126.62"
 DB_PORT = "5433"
 
 conn_1 = psycopg2.connect(
@@ -151,8 +151,8 @@ def load_orders_realizations_to_dds():
     		s.realization_number, 
     		s.item_number, 
     		s.count, 
-    		replace(s.price)::float8, 
-    		s.total_sum, 
+    		to_number(s.price, '9999999.99'),
+                to_number(s.total_sum, '9999999999.99'), 
     		s.comment  
 	    FROM "STG".sales as s
 	    left join "DDS".clients as c using(client_id)	    
