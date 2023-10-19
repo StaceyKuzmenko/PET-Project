@@ -126,8 +126,8 @@ def load_orders_realizations_to_dds():
     		os.realization_number, 
     		os.item_number, 
     		os.count, 
-    		replace(os.price)::float8, 
-    		os.total_sum, 
+    		to_number(os.price, '9999999.99'),
+                to_number(os.total_sum, '9999999999.99'),
     		os.comment  
 	    FROM "STG".old_sales as os
 	    left join "DDS".clients as c using(client_id)	    
