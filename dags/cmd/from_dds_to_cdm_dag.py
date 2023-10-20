@@ -70,7 +70,7 @@ def load_all_months_aggregated_sales():
         print("Error with insert at all_months_aggregated_sales:", error)
     finally:
         # Close the connection
-	conn_1.commit()
+        conn_1.commit()
         conn_1.close()
 
 def load_monthly_sales_by_brands():
