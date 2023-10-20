@@ -7,14 +7,12 @@ from airflow import DAG
 from airflow.decorators import dag, task
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python import PythonOperator
-from airflow.utils.task_group import TaskGroup
-#from airflow.operators.dummy import DummyOperator
 
 ### POSTGRESQL settings ###
 # init connection
 # Connect to your local postgres DB (Docker)
 
-conn_1 = psycopg2.connect('postgres_db_conn')
+conn_1 = psycopg2.connect(postgres_db_conn)
 
 # load data from STG
 # paste data to DDS local connection
