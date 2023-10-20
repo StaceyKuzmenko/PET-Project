@@ -135,8 +135,18 @@ def load_orders_realizations_to_dds():
     		os.realization_number, 
     		os.item_number, 
     		os.count, 
-    		to_number(os.price, '9999999.99'),
-                to_number(os.total_sum, '9999999999.99'),
+    		CASE          
+          		WHEN os.price ~ E'^[0-9]+\\.[0-9]+$' THEN CAST(os.price AS NUMERIC)
+            	WHEN os.price ~ E'^[0-9]+,[0-9]+$' THEN CAST(REPLACE(os.price, ',', '.') AS NUMERIC)
+            	WHEN os.price ~ E'^[0-9]+ [0-9]+,[0-9]+$' THEN CAST(REPLACE(REPLACE(os.price, ' ', ''), ',', '.') AS NUMERIC)
+            	ELSE NULL -- Handles values with consistent format (either dot or comma)
+        	end as price,
+        	CASE          
+          		WHEN os.total_sum ~ E'^[0-9]+\\.[0-9]+$' THEN CAST(os.total_sum AS NUMERIC)
+            	WHEN os.total_sum ~ E'^[0-9]+,[0-9]+$' THEN CAST(REPLACE(os.total_sum, ',', '.') AS NUMERIC)
+            	WHEN os.total_sum ~ E'^[0-9]+ [0-9]+,[0-9]+$' THEN CAST(REPLACE(REPLACE(os.total_sum, ' ', ''), ',', '.') AS NUMERIC)
+            	ELSE NULL -- Handles values with consistent format (either dot or comma)
+        	end as total_sum,
     		os.comment  
 	    FROM "STG".old_sales as os
 	    left join "DDS".clients as c using(client_id)	    
@@ -160,8 +170,18 @@ def load_orders_realizations_to_dds():
     		s.realization_number, 
     		s.item_number, 
     		s.count, 
-    		to_number(s.price, '9999999.99'),
-                to_number(s.total_sum, '9999999999.99'), 
+    		CASE          
+          		WHEN s.price ~ E'^[0-9]+\\.[0-9]+$' THEN CAST(s.price AS NUMERIC)
+            	WHEN s.price ~ E'^[0-9]+,[0-9]+$' THEN CAST(REPLACE(s.price, ',', '.') AS NUMERIC)
+            	WHEN s.price ~ E'^[0-9]+ [0-9]+,[0-9]+$' THEN CAST(REPLACE(REPLACE(s.price, ' ', ''), ',', '.') AS NUMERIC)
+            	ELSE NULL -- Handles values with consistent format (either dot or comma)
+        	end as price,
+        	CASE          
+          		WHEN s.total_sum ~ E'^[0-9]+\\.[0-9]+$' THEN CAST(s.total_sum AS NUMERIC)
+            	WHEN s.total_sum ~ E'^[0-9]+,[0-9]+$' THEN CAST(REPLACE(s.total_sum, ',', '.') AS NUMERIC)
+            	WHEN s.total_sum ~ E'^[0-9]+ [0-9]+,[0-9]+$' THEN CAST(REPLACE(REPLACE(s.total_sum, ' ', ''), ',', '.') AS NUMERIC)
+            	ELSE NULL -- Handles values with consistent format (either dot or comma)
+        	end as total_sum,
     		s.comment  
 	    FROM "STG".sales as s
 	    left join "DDS".clients as c using(client_id)	    
