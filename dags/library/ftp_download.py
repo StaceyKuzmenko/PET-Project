@@ -4,7 +4,7 @@ import os
 import logging
 
 #import pydantic
-logger = logging.getLogger("airflow")
+logger = logging.getLogger("airflow.task")
 
 def get_files_from_ftp(folder_list:list, host, user:str, passwd:str):
     #establishing ftp connetion and 
