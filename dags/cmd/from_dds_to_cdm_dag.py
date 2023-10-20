@@ -7,8 +7,6 @@ from airflow import DAG
 from airflow.decorators import dag, task
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python import PythonOperator
-from airflow.utils.task_group import TaskGroup
-#from airflow.operators.dummy import DummyOperator
 
 ### POSTGRESQL settings ###
 # init connection
