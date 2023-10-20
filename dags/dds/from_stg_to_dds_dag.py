@@ -12,7 +12,15 @@ from airflow.operators.python import PythonOperator
 # init connection
 # Connect to your local postgres DB (Docker)
 
-conn_1 = psycopg2.connect('postgres_db_conn' == dsn)
+DB_NAME = "project_db"
+DB_USER = "project_user"
+DB_PASS = "project_password"
+DB_HOST = "91.107.126.62"
+DB_PORT = "5433"
+
+conn_1 = psycopg2.connect(
+    database=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port=DB_PORT
+)
 
 # load data from STG
 # paste data to DDS local connection
