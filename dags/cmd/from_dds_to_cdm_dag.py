@@ -24,8 +24,6 @@ conn_1 = psycopg2.connect(
     database=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port=DB_PORT
 )
 
-conn_1 = psycopg2.connect('postgres_db_conn')
-
 # load data from DDS
 # paste data to CDM local connection
 def load_monthly_sales_by_brands():
