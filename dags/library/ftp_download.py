@@ -4,7 +4,8 @@ import os
 import logging
 
 #import pydantic
-logger = logging.getLogger("airflow.task")
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger("airflow.ftp")
 
 def get_files_from_ftp(folder_list:list, host, user:str, passwd:str):
     #establishing ftp connetion and 
@@ -13,13 +14,13 @@ def get_files_from_ftp(folder_list:list, host, user:str, passwd:str):
         ftp.login(user=user, passwd=passwd)
         
         for folder in folder_list:
-            logger.info('FTP path: ', os.path.join('Engeocom', 'test', folder))
+            logger.debug('FTP path: ', os.path.join('Engeocom', 'test', folder))
             #changing home folder to Engeocom
             ftp.cwd(os.path.join('/', 'Engeocom', 'test', folder))
             
             #getting the list of filenames 
             filelist = ftp.nlst()
-            logger.info(filelist)
+            logger.debug(filelist)
 
             #looping through the list of files in a folder
             for file in filelist:
