@@ -25,99 +25,110 @@ conn_1 = psycopg2.connect(
 # load data from STG
 # paste data to DDS local connection
 def load_managers_to_dds():
-    # fetching time UTC and table
-    fetching_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    current_table = "managers"
+    try:
+        # fetching time UTC and table
+        fetching_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        current_table = "managers"
 
-    # load to local to DB (managers)
-    cur_1 = conn_1.cursor()
-    postgres_insert_query = """ 
-    INSERT INTO "DDS".managers(manager)
-    SELECT DISTINCT manager  
-    FROM "STG".old_sales
-    WHERE NOT EXISTS (
-		SELECT 1
-		FROM "DDS".managers
-		WHERE "DDS".managers.manager = "STG".old_sales.manager 
-    );
-    INSERT INTO "DDS".managers(manager)
-    SELECT DISTINCT manager  
-    FROM "STG".sales
-    WHERE NOT EXISTS (
-		SELECT 1
-		FROM "DDS".managers
-		WHERE "DDS".managers.manager = "STG".sales.manager 
-    );
-    """
-    cur_1.execute(postgres_insert_query)
-    conn_1.commit()
-    conn_1.close()
+        # load to local to DB (managers)
+        cur_1 = conn_1.cursor()
+        postgres_insert_query = """ 
+        INSERT INTO "DDS".managers(manager)
+        SELECT DISTINCT manager  
+        FROM "STG".old_sales
+        WHERE NOT EXISTS (
+	    SELECT 1
+	    FROM "DDS".managers
+	    WHERE "DDS".managers.manager = "STG".old_sales.manager 
+        );
+        INSERT INTO "DDS".managers(manager)
+        SELECT DISTINCT manager  
+        FROM "STG".sales
+        WHERE NOT EXISTS (
+	    SELECT 1
+	    FROM "DDS".managers
+	    WHERE "DDS".managers.manager = "STG".sales.manager 
+        );
+        """
+        cur_1.execute(postgres_insert_query)
+    except (Exception, psycopg2.DatabaseError) as error:
+        print("Error with insert at managers:", error)
+    finally:
+        # Close the connection    
+        conn_1.commit()
+        conn_1.close()
 
 def load_clients_to_dds():
-    # fetching time UTC and table
-    fetching_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    current_table = "clients"
+    try:
+        # fetching time UTC and table
+        fetching_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        current_table = "clients"
 
-    # load to local to DB (clients)
-    cur_1 = conn_1.cursor()
-    postgres_insert_query = """ 
-    INSERT INTO "DDS".clients(client_id, client, manager_id, sales_channel, region)
-    SELECT DISTINCT os.client_id,
-           os.client,
-           m.id AS manager_id,
-           os.sales_channel,
-           os.region 
-    FROM "STG".old_sales AS os 
-    LEFT JOIN "DDS".clients AS c using(client_id) 
-    LEFT JOIN "DDS".managers AS m using(manager)
-    WHERE NOT EXISTS (
-		SELECT 1
-		FROM "DDS".clients
-		WHERE "DDS".clients.client_id = os.client_id 
-    )
-    ;
-    INSERT INTO "DDS".clients(client_id, client, manager_id, sales_channel, region)
-    SELECT DISTINCT s.client_id,
-           s.client,
-           m.id AS manager_id,
-           s.sales_channel,
-           s.region 
-    FROM "STG".sales AS s 
-    LEFT JOIN "DDS".clients AS c using(client_id) 
-    LEFT JOIN "DDS".managers AS m using(manager)
-    WHERE NOT EXISTS (
-		SELECT 1
-		FROM "DDS".clients
-		WHERE "DDS".clients.client_id = s.client_id 
-    )
-    ;
-    """
-    cur_1.execute(postgres_insert_query)    
-    conn_1.commit()
-    conn_1.close()
+        # load to local to DB (clients)
+        cur_1 = conn_1.cursor()
+        postgres_insert_query = """ 
+        INSERT INTO "DDS".clients(client_id, client, manager_id, sales_channel, region)
+        SELECT DISTINCT os.client_id,
+            os.client,
+            m.id AS manager_id,
+            os.sales_channel,
+            os.region 
+        FROM "STG".old_sales AS os 
+        LEFT JOIN "DDS".clients AS c using(client_id) 
+        LEFT JOIN "DDS".managers AS m using(manager)
+        WHERE NOT EXISTS (
+	    SELECT 1
+	    FROM "DDS".clients
+            WHERE "DDS".clients.client_id = os.client_id 
+        )
+        ;
+        INSERT INTO "DDS".clients(client_id, client, manager_id, sales_channel, region)
+        SELECT DISTINCT s.client_id,
+            s.client,
+            m.id AS manager_id,
+            s.sales_channel,
+            s.region 
+        FROM "STG".sales AS s 
+        LEFT JOIN "DDS".clients AS c using(client_id) 
+        LEFT JOIN "DDS".managers AS m using(manager)
+	WHERE NOT EXISTS (
+	    SELECT 1
+	    FROM "DDS".clients
+            WHERE "DDS".clients.client_id = s.client_id 
+        )
+        ;
+        """
+        cur_1.execute(postgres_insert_query)   
+    except (Exception, psycopg2.DatabaseError) as error:
+        print("Error with insert at clients:", error)
+    finally:
+        # Close the connection    
+        conn_1.commit()
+        conn_1.close()
 
 def load_orders_realizations_to_dds():
-    # fetching time UTC and table
-    fetching_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    current_table = "orders_realizations"
+    try:
+        # fetching time UTC and table
+        fetching_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        current_table = "orders_realizations"
 
-    # load to local to DB (orders_realization)
-    cur_1 = conn_1.cursor()
-    postgres_insert_query = """ 
-    TRUNCATE "DDS".orders_realizations;
-    INSERT INTO "DDS".orders_realizations(
-	client_id, 
-	order_date, 
-	order_number, 
-	realization_date, 
-	realization_number, 
-	item_number, 
-	count, 
-	price, 
-	total_sum, 
-	comment)
-    	SELECT  
-    		c.id as client_id, 
+        # load to local to DB (orders_realization)
+        cur_1 = conn_1.cursor()
+        postgres_insert_query = """ 
+        TRUNCATE "DDS".orders_realizations;
+        INSERT INTO "DDS".orders_realizations(
+	    client_id, 
+	    order_date, 
+	    order_number, 
+	    realization_date, 
+	    realization_number, 
+	    item_number, 
+	    count, 
+	    price, 
+	    total_sum, 
+	    comment)
+    	    SELECT  
+    	        c.id as client_id, 
     		to_date(os.order_date, 'DD-MM-YYYY'), 
     		os.order_number, 
     		to_date(os.realization_date, 'DD-MM-YYYY'), 
@@ -129,19 +140,19 @@ def load_orders_realizations_to_dds():
     		os.comment  
 	    FROM "STG".old_sales as os
 	    left join "DDS".clients as c using(client_id)	    
-    ;
-    INSERT INTO "DDS".orders_realizations(
-	client_id, 
-	order_date, 
-	order_number, 
-	realization_date, 
-	realization_number, 
-	item_number, 
-	count, 
-	price, 
-	total_sum, 
-	comment)
-    	SELECT 
+        ;
+        INSERT INTO "DDS".orders_realizations(
+	    client_id, 
+	    order_date, 
+	    order_number, 
+	    realization_date, 
+	    realization_number, 
+	    item_number, 
+	    count, 
+	    price, 
+	    total_sum, 
+	    comment)
+    	    SELECT 
     		c.id as client_id, 
     		to_date(s.order_date, 'DD-MM-YYYY'), 
     		s.order_number, 
@@ -154,11 +165,15 @@ def load_orders_realizations_to_dds():
     		s.comment  
 	    FROM "STG".sales as s
 	    left join "DDS".clients as c using(client_id)	    
-    ;
-    """
-    cur_1.execute(postgres_insert_query)    
-    conn_1.commit()
-    conn_1.close()
+        ;
+        """
+        cur_1.execute(postgres_insert_query)    
+    except (Exception, psycopg2.DatabaseError) as error:
+        print("Error with insert at orders_realizations:", error)
+    finally:
+        # Close the connection    
+        conn_1.commit()
+        conn_1.close()
 
 default_args = {
     "owner": "airflow",
