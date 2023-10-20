@@ -14,7 +14,7 @@ from airflow.utils.task_group import TaskGroup
 # init connection
 # Connect to your local postgres DB (Docker)
 
-conn_1 = psycopg2.getconn('postgres_db_conn')
+conn_1 = psycopg2.connect('postgres_db_conn')
 
 # load data from STG
 # paste data to DDS local connection
