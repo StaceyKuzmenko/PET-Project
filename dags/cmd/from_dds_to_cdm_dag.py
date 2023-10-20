@@ -24,7 +24,7 @@ from airflow.utils.task_group import TaskGroup
 #    database=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port=DB_PORT
 #)
 
-conn_1 = psycopg2.getconn('postgres_db_conn')
+conn_1 = psycopg2.connect('postgres_db_conn')
 
 # load data from DDS
 # paste data to CDM local connection
