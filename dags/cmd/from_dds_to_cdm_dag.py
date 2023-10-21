@@ -7,16 +7,25 @@ from airflow import DAG
 from airflow.decorators import dag, task
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python import PythonOperator
+from airflow.hooks.base import BaseHook
 
 ### POSTGRESQL settings ###
 # init connection
 # Connect to your local postgres DB (Docker)
 
-DB_NAME = "project_db"
-DB_USER = "project_user"
-DB_PASS = "project_password"
-DB_HOST = "91.107.126.62"
-DB_PORT = "5433"
+# DB_NAME = "project_db"
+# DB_USER = "project_user"
+# DB_PASS = "project_password"
+# DB_HOST = "91.107.126.62"
+# DB_PORT = "5433"
+
+conn = BaseHook.get_connection('postgres_local')
+
+DB_NAME = conn.schema
+DB_USER = conn.login
+DB_PASS = conn.password
+DB_HOST = conn.host
+DB_PORT = conn.port
 
 conn_1 = psycopg2.connect(
     database=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port=DB_PORT
