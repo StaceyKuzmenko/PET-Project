@@ -1,4 +1,4 @@
---DROP TABLE IF EXISTS "STG".test_sales;
+--DROP TABLE IF EXISTS "STG".sales;
 CREATE TABLE "STG".sales (
 	manager_id int4 NULL,
 	manager varchar NULL,
@@ -15,20 +15,21 @@ CREATE TABLE "STG".sales (
 	product_name varchar NOT NULL,
 	brand varchar NULL,
 	count int4 NULL,
-	price numeric(14, 2) NULL,
-	total_sum numeric(14, 2) NULL,
+	price varchar NULL,
+	total_sum varchar NULL,
 	"comment" varchar NULL
 );
 
---DROP TABLE IF EXISTS "STG".test_category;
+--DROP TABLE IF EXISTS "STG".category;
 CREATE TABLE "STG".category (
 	item_number varchar NOT NULL,
 	product_name varchar NOT NULL,
+	subbrand varchar NULL,
 	brand varchar NOT NULL,
 	product_category varchar NULL
 );
 
---DROP TABLE IF EXISTS "STG".test_forecast;
+--DROP TABLE IF EXISTS "STG".forecast;
 CREATE TABLE "STG".forecast (
 	manager varchar NOT NULL,
 	client_id varchar NOT NULL,
@@ -42,7 +43,7 @@ CREATE TABLE "STG".forecast (
 	week_5 numeric(14, 2) NULL
 );
 
-
+--DROP TABLE IF EXISTS "STG".old_sales;
 CREATE TABLE "STG".old_sales (
 	manager_id int4 NULL,
 	manager varchar NULL,
@@ -59,7 +60,16 @@ CREATE TABLE "STG".old_sales (
 	product_name varchar NOT NULL,
 	brand varchar NULL,
 	count int4 NULL,
-	price numeric(14, 2) NULL,
-	total_sum numeric(14, 2) NULL,
+	price varchar NULL,
+	total_sum varchar NULL,
 	"comment" varchar NULL
+);
+
+--DROP TABLE IF EXISTS "STG".marketplaces;
+CREATE TABLE "STG".marketplaces (
+	manager varchar NOT null,
+	client_id varchar NOT null,
+	client varchar NOT null,
+	brand varchar NOT null,
+	total_realizations numeric(14,2) null
 );
