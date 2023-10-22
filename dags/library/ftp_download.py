@@ -14,18 +14,17 @@ def get_files_from_ftp(folder_list:list, host, user:str, passwd:str):
         ftp.login(user=user, passwd=passwd)
         
         for folder in folder_list:
+            latest_time = None
+            latest_name = None
             logger.debug('FTP path: ', os.path.join('Engeocom', 'test', folder))
             #changing home folder to Engeocom
             ftp.cwd(os.path.join('/', 'Engeocom', 'test', folder))
             
             #getting the list of filenames 
             filelist = ftp.nlst()
-            #logger.debug(filelist)
 
             #looping through the list of files in a folder
             for file in filelist:
-                latest_time = None
-                latest_name = None
                 #get the time when the file was modified    
                 modified_time = ftp.sendcmd('MDTM ' + file)
                 
@@ -47,7 +46,7 @@ def get_files_from_ftp(folder_list:list, host, user:str, passwd:str):
                 ftp.retrbinary('RETR '+ latest_name, f.write)
         
         #closing the ftp connetion
-        ftp.close
+        ftp.close()
     except Exception as err:
         logger.error(err)
 
