@@ -20,7 +20,7 @@ def get_files_from_ftp(folder_list:list, host, user:str, passwd:str):
             
             #getting the list of filenames 
             filelist = ftp.nlst()
-            logger.debug(filelist)
+            #logger.debug(filelist)
 
             #looping through the list of files in a folder
             for file in filelist:
