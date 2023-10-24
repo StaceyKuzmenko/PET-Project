@@ -42,8 +42,7 @@ def load_managers_to_dds():
 
         # load to local to DB (managers)
         cur_1 = conn_1.cursor()
-        postgres_insert_query = 
-	""" 
+        postgres_insert_query = """ 
         INSERT INTO "DDS".managers(manager)
         SELECT DISTINCT manager  
         FROM "STG".old_sales
@@ -62,11 +61,13 @@ def load_managers_to_dds():
         );
         """
 	cur_1.execute(postgres_insert_query)
+        conn_1.commit()
+#        conn_1.close()	    
     except Exception as error:
 	print("Exception TYPE:", type(error))
     finally:
         # Close the connection    
-        conn_1.commit()
+#        conn_1.commit()
         conn_1.close()
 
 def load_clients_to_dds():
