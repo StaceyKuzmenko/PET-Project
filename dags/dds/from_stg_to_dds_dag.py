@@ -62,13 +62,13 @@ def load_managers_to_dds():
         """
 	cur_1.execute(postgres_insert_query)
         conn_1.commit()
-#        conn_1.close()	    
+        conn_1.close()	    
     except Exception as error:
 	print("Exception TYPE:", type(error))
-    finally:
+#    finally:
         # Close the connection    
 #        conn_1.commit()
-        conn_1.close()
+#        conn_1.close()
 
 def load_clients_to_dds():
     try:
