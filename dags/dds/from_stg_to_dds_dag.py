@@ -61,8 +61,8 @@ def load_managers_to_dds():
         );
         """
         cur_1.execute(postgres_insert_query)
-    except (Exception, psycopg2.DatabaseError) as error:
-        print("Error with insert at managers:", error)
+    except Exception as error:
+	print("Error with insert at managers:", error)
     finally:
         # Close the connection    
         conn_1.commit()
@@ -109,7 +109,7 @@ def load_clients_to_dds():
         ;
         """
         cur_1.execute(postgres_insert_query)   
-    except (Exception, psycopg2.DatabaseError) as error:
+    except Exception as error:
         print("Error with insert at clients:", error)
     finally:
         # Close the connection    
@@ -197,7 +197,7 @@ def load_orders_realizations_to_dds():
         ;
         """
         cur_1.execute(postgres_insert_query)    
-    except (Exception, psycopg2.DatabaseError) as error:
+    except Exception as error:
         print("Error with insert at orders_realizations:", error)
     finally:
         # Close the connection    
