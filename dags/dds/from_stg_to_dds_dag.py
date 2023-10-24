@@ -125,86 +125,76 @@ def load_orders_realizations_to_dds():
     # load to local to DB (orders_realization)
     cur_1 = conn_1.cursor()
     postgres_insert_query = """ 
-    INSERT INTO "DDS".orders_realizations(
-      client_id, order_date, order_number, 
-      realization_date, realization_number, 
-      item_number, count, price, total_sum, 
-      comment
-    ) 
-    SELECT 
-      c.id as client_id, 
-      to_date(os.order_date, 'DD-MM-YYYY'), 
-      os.order_number, 
-      to_date(
-        os.realization_date, 'DD-MM-YYYY'
-      ), 
-      os.realization_number, 
-      os.item_number, 
-      os.count, 
-      CASE WHEN os.price ~ E '^[0-9]+\\.[0-9]+$' THEN CAST(os.price AS NUMERIC) WHEN os.price ~ E '^[0-9]+,[0-9]+$' THEN CAST(
-        REPLACE(os.price, ',', '.') AS NUMERIC
-      ) WHEN os.price ~ E '^[0-9]+ [0-9]+,[0-9]+$' THEN CAST(
-        REPLACE(
-          REPLACE(os.price, ' ', ''), 
-          ',', 
-          '.'
-        ) AS NUMERIC
-      ) ELSE NULL -- Handles values with consistent format (either dot or comma)
-      end as price, 
-      CASE WHEN os.total_sum ~ E '^[0-9]+\\.[0-9]+$' THEN CAST(os.total_sum AS NUMERIC) WHEN os.total_sum ~ E '^[0-9]+,[0-9]+$' THEN CAST(
-        REPLACE(os.total_sum, ',', '.') AS NUMERIC
-      ) WHEN os.total_sum ~ E '^[0-9]+ [0-9]+,[0-9]+$' THEN CAST(
-        REPLACE(
-          REPLACE(os.total_sum, ' ', ''), 
-          ',', 
-          '.'
-        ) AS NUMERIC
-      ) ELSE NULL -- Handles values with consistent format (either dot or comma)
-      end as total_sum, 
-      os.comment 
-    FROM 
-      "STG".old_sales as os 
-      left join "DDS".clients as c using(client_id);
-    INSERT INTO "DDS".orders_realizations(
-      client_id, order_date, order_number, 
-      realization_date, realization_number, 
-      item_number, count, price, total_sum, 
-      comment
-    ) 
-    SELECT 
-      c.id as client_id, 
-      to_date(s.order_date, 'DD-MM-YYYY'), 
-      s.order_number, 
-      to_date(
-        s.realization_date, 'DD-MM-YYYY'
-      ), 
-      s.realization_number, 
-      s.item_number, 
-      s.count, 
-      CASE WHEN s.price ~ E '^[0-9]+\\.[0-9]+$' THEN CAST(s.price AS NUMERIC) WHEN s.price ~ E '^[0-9]+,[0-9]+$' THEN CAST(
-        REPLACE(s.price, ',', '.') AS NUMERIC
-      ) WHEN s.price ~ E '^[0-9]+ [0-9]+,[0-9]+$' THEN CAST(
-        REPLACE(
-          REPLACE(s.price, ' ', ''), 
-          ',', 
-          '.'
-        ) AS NUMERIC
-      ) ELSE NULL -- Handles values with consistent format (either dot or comma)
-      end as price, 
-      CASE WHEN s.total_sum ~ E '^[0-9]+\\.[0-9]+$' THEN CAST(s.total_sum AS NUMERIC) WHEN s.total_sum ~ E '^[0-9]+,[0-9]+$' THEN CAST(
-        REPLACE(s.total_sum, ',', '.') AS NUMERIC
-      ) WHEN s.total_sum ~ E '^[0-9]+ [0-9]+,[0-9]+$' THEN CAST(
-        REPLACE(
-          REPLACE(s.total_sum, ' ', ''), 
-          ',', 
-          '.'
-        ) AS NUMERIC
-      ) ELSE NULL -- Handles values with consistent format (either dot or comma)
-      end as total_sum, 
-      s.comment 
-    FROM 
-      "STG".sales as s 
-      left join "DDS".clients as c using(client_id);
+        INSERT INTO "DDS".orders_realizations(
+	    client_id, 
+	    order_date, 
+	    order_number, 
+	    realization_date, 
+	    realization_number, 
+	    item_number, 
+	    count, 
+	    price, 
+	    total_sum, 
+	    comment)
+    	    SELECT  
+    	        c.id as client_id, 
+    		to_date(os.order_date, 'DD-MM-YYYY'), 
+    		os.order_number, 
+    		to_date(os.realization_date, 'DD-MM-YYYY'), 
+    		os.realization_number, 
+    		os.item_number, 
+    		os.count, 
+    		CASE          
+          		WHEN os.price ~ E'^[0-9]+\\.[0-9]+$' THEN CAST(os.price AS NUMERIC)
+            	WHEN os.price ~ E'^[0-9]+,[0-9]+$' THEN CAST(REPLACE(os.price, ',', '.') AS NUMERIC)
+            	WHEN os.price ~ E'^[0-9]+ [0-9]+,[0-9]+$' THEN CAST(REPLACE(REPLACE(os.price, ' ', ''), ',', '.') AS NUMERIC)
+            	ELSE NULL -- Handles values with consistent format (either dot or comma)
+        	end as price,
+        	CASE          
+          		WHEN os.total_sum ~ E'^[0-9]+\\.[0-9]+$' THEN CAST(os.total_sum AS NUMERIC)
+            	WHEN os.total_sum ~ E'^[0-9]+,[0-9]+$' THEN CAST(REPLACE(os.total_sum, ',', '.') AS NUMERIC)
+            	WHEN os.total_sum ~ E'^[0-9]+ [0-9]+,[0-9]+$' THEN CAST(REPLACE(REPLACE(os.total_sum, ' ', ''), ',', '.') AS NUMERIC)
+            	ELSE NULL -- Handles values with consistent format (either dot or comma)
+        	end as total_sum,
+    		os.comment  
+	    FROM "STG".old_sales as os
+	    left join "DDS".clients as c using(client_id)	    
+        ;
+        INSERT INTO "DDS".orders_realizations(
+	    client_id, 
+	    order_date, 
+	    order_number, 
+	    realization_date, 
+	    realization_number, 
+	    item_number, 
+	    count, 
+	    price, 
+	    total_sum, 
+	    comment)
+    	    SELECT 
+    		c.id as client_id, 
+    		to_date(s.order_date, 'DD-MM-YYYY'), 
+    		s.order_number, 
+    		to_date(s.realization_date, 'DD-MM-YYYY'), 
+    		s.realization_number, 
+    		s.item_number, 
+    		s.count, 
+    		CASE          
+          		WHEN s.price ~ E'^[0-9]+\\.[0-9]+$' THEN CAST(s.price AS NUMERIC)
+            	WHEN s.price ~ E'^[0-9]+,[0-9]+$' THEN CAST(REPLACE(s.price, ',', '.') AS NUMERIC)
+            	WHEN s.price ~ E'^[0-9]+ [0-9]+,[0-9]+$' THEN CAST(REPLACE(REPLACE(s.price, ' ', ''), ',', '.') AS NUMERIC)
+            	ELSE NULL -- Handles values with consistent format (either dot or comma)
+        	end as price,
+        	CASE          
+          		WHEN s.total_sum ~ E'^[0-9]+\\.[0-9]+$' THEN CAST(s.total_sum AS NUMERIC)
+            	WHEN s.total_sum ~ E'^[0-9]+,[0-9]+$' THEN CAST(REPLACE(s.total_sum, ',', '.') AS NUMERIC)
+            	WHEN s.total_sum ~ E'^[0-9]+ [0-9]+,[0-9]+$' THEN CAST(REPLACE(REPLACE(s.total_sum, ' ', ''), ',', '.') AS NUMERIC)
+            	ELSE NULL -- Handles values with consistent format (either dot or comma)
+        	end as total_sum,
+    		s.comment  
+	    FROM "STG".sales as s
+	    left join "DDS".clients as c using(client_id)	    
+        ;
     """
     cur_1.execute(postgres_insert_query)    
     conn_1.commit()
