@@ -60,7 +60,7 @@ def load_managers_to_dds():
 	    WHERE "DDS".managers.manager = "STG".sales.manager 
         );
         """
-	return cur_1.execute(postgres_insert_query)
+	cur_1.execute(postgres_insert_query)
     except Exception as error:
 	print("Exception TYPE:", type(error))
     finally:
