@@ -42,7 +42,8 @@ def load_managers_to_dds():
 
         # load to local to DB (managers)
         cur_1 = conn_1.cursor()
-        postgres_insert_query = """ 
+        postgres_insert_query = 
+	""" 
         INSERT INTO "DDS".managers(manager)
         SELECT DISTINCT manager  
         FROM "STG".old_sales
