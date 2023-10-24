@@ -125,7 +125,6 @@ def load_orders_realizations_to_dds():
         # load to local to DB (orders_realization)
         cur_1 = conn_1.cursor()
         postgres_insert_query = """ 
-        TRUNCATE "DDS".orders_realizations;
         INSERT INTO "DDS".orders_realizations(
 	    client_id, 
 	    order_date, 
