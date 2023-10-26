@@ -154,7 +154,7 @@ def load_monthly_sales_by_sales_channels():
 	FROM a
 	WHERE NOT EXISTS (SELECT 1 FROM "CDM".monthly_sales_by_sales_channels AS t1 WHERE t1.client = a.client and t1.realization_month = '2023-09');
         """
-	cur_1.execute(postgres_insert_query) 
+        cur_1.execute(postgres_insert_query) 
     except (Exception, psycopg2.DatabaseError) as error:
         print("Error with insert at monthly_sales_by_sales_channels:", error)
     finally:
