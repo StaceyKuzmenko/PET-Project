@@ -67,9 +67,9 @@ CREATE TABLE "STG".old_sales (
 
 --DROP TABLE IF EXISTS "STG".marketplaces;
 CREATE TABLE "STG".marketplaces (
-	manager varchar NOT null,
-	client_id varchar NOT null,
-	client varchar NOT null,
-	brand varchar NOT null,
-	total_realizations numeric(14,2) null
+	manager varchar NOT NULL,
+	client_id varchar NOT NULL,
+	client varchar NOT NULL,
+	brand varchar NOT NULL,
+	total_realizations numeric(14, 2) NULL
 );
