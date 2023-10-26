@@ -129,8 +129,32 @@ def load_monthly_sales_by_sales_channels():
         LEFT JOIN "DDS".clients c ON amas.client_id=c.id
         GROUP BY realization_month, c.client, amas.sales_channel
         ORDER BY to_char(amas.realization_date, 'YYYY-MM');
+
+	with a as(
+	select  
+		distinct m.client,
+		sum(m.total_realizations) as total_realizations
+	FROM "STG".marketplaces as m
+	group by m.client
+	)
+	UPDATE "CDM".monthly_sales_by_sales_channels
+	SET total_sum = GREATEST("CDM".monthly_sales_by_sales_channels.total_sum, a.total_realizations)
+	FROM a
+	WHERE "CDM".monthly_sales_by_sales_channels.client = a.client and "CDM".monthly_sales_by_sales_channels.realization_month = '2023-09';
+
+	with a as(
+	select  
+		distinct m.client,
+		sum(m.total_realizations) as total_realizations
+	FROM "STG".marketplaces as m
+	group by m.client
+	)
+	INSERT INTO "CDM".monthly_sales_by_sales_channels (realization_month, client, sales_channel, total_sum)
+	SELECT '2023-09', a.client, 'Шармбатон', a.total_realizations
+	FROM a
+	WHERE NOT EXISTS (SELECT 1 FROM "CDM".monthly_sales_by_sales_channels AS t1 WHERE t1.client = a.client and t1.realization_month = '2023-09');
         """
-        cur_1.execute(postgres_insert_query) 
+	cur_1.execute(postgres_insert_query) 
     except (Exception, psycopg2.DatabaseError) as error:
         print("Error with insert at monthly_sales_by_sales_channels:", error)
     finally:
@@ -152,6 +176,7 @@ def load_to_current_month_aggregated_sales():
         with a as (
 	    select
 		distinct or2.client_id,
+  		or2.realization_number,
 		c.subbrand,
 		case
 		    when or2.realization_number is null or or2.realization_number = '' then sum(or2.total_sum)
@@ -163,7 +188,7 @@ def load_to_current_month_aggregated_sales():
 		end as realizations_sum
 	    from "DDS".orders_realizations or2
 	    left join "STG".category as c using(item_number)
-	    where to_char(or2.order_date, 'YYYY-MM') = '2023-09'
+	    where to_char(or2.order_date, 'YYYY-MM') = '2023-09' or to_char(or2.realization_date, 'YYYY-MM') = '2023-09'
 	    group by or2.client_id, c.subbrand, or2.realization_number
 	    ),
         b as (
@@ -182,8 +207,8 @@ def load_to_current_month_aggregated_sales():
 		m.manager,
 		b.client,
 		b.subbrand,
-		case when b.orders_sum is null then 0 else b.orders_sum end,
-		case when b.realizations_sum is null then 0 else b.realizations_sum end
+		b.orders_sum,
+		b.realizations_sum
 	    from b
 	    left join "DDS".managers m on b.manager_id=m.id
 	    ;
@@ -219,12 +244,12 @@ def load_to_monthly_sales_report():
 		f.manager,
 		f.client,
 		f.brand,
-		case when f.general_plan is null then 0 else f.general_plan end,
-		case when f.week_1 is null then 0 else f.week_1 end,
-		case when f.week_2 is null then 0 else f.week_2 end,
-		case when f.week_3 is null then 0 else f.week_3 end,
-		case when f.week_4 is null then 0 else f.week_4 end,
-		case when f.week_5 is null then 0 else f.week_5 end
+		f.general_plan,
+		f.week_1,
+		f.week_2,
+		f.week_3,
+		f.week_4,
+		f.week_5
 	    from "STG".forecast f
         )
         insert into "CDM".monthly_sales_report(manager, client, brand, general_plan, plan_comletion_percent, orders_sum, realizations_sum, total_sum, week_1, week_2, week_3, week_4, week_5, general_forecast, forecast_completion_percent)
@@ -237,9 +262,9 @@ def load_to_monthly_sales_report():
         WHEN e.general_plan <= 0 THEN 0 -- Handle division by zero or negative revenue
         ELSE (cmas.orders_sum + cmas.realizations_sum) / e.general_plan
         END AS plan_completion_percent,
-	    case when cmas.orders_sum is null then 0 else cmas.orders_sum end, --done
-	    case when cmas.realizations_sum is null then 0 else cmas.realizations_sum end,	--done
-	    cmas.orders_sum + cmas.realizations_sum as total_sum, --done
+	    cmas.orders_sum,
+	    cmas.realizations_sum,
+	    cmas.orders_sum + cmas.realizations_sum as total_sum,
 	    e.week_1,
 	    e.week_2,
 	    e.week_3,
@@ -269,8 +294,8 @@ def load_to_monthly_sales_report():
 	    t2.manager,
 	    t2.client, 
 	    t2.subbrand, 
-	    case when t2.orders_sum is null then 0 else t2.orders_sum end,
-	    case when t2.realizations_sum is null then 0 else t2.realizations_sum end
+	    t2.orders_sum,
+	    t2.realizations_sum
         FROM "CDM".current_month_aggregated_sales AS t2
         WHERE NOT EXISTS (SELECT 1 FROM "CDM".monthly_sales_report AS t1 WHERE t1.manager = t2.manager and t1.client = t2.client and t1.brand = t2.subbrand);
         """
