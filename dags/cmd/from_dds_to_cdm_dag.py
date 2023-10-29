@@ -42,6 +42,8 @@ def load_all_months_aggregated_sales():
         # load to local to DB (all_months_aggregated_sales)
         cur_1 = conn_1.cursor()
         postgres_insert_query = """ 
+	--заливаем данные в итоговую витрину данных "Агрегированные продажи за весь период (2017-2023 гг.) по месяцам"
+ 	--сначала заливаем данные по отгрузкам (это товары, у которых есть номер заказа и реализации (отгрузки))
         TRUNCATE "CDM".all_months_aggregated_sales;
         INSERT INTO "CDM".all_months_aggregated_sales (client_id, sales_channel, realization_date, item_number, subbrand, brand, count, total_sum)
         SELECT 
@@ -58,6 +60,9 @@ def load_all_months_aggregated_sales():
         LEFT JOIN "STG".category AS stgc using(item_number)
         WHERE or2.realization_date IS NOT NULL
         ;
+	--в таблице "DDS".orders_realizations есть как отгруженные заказы, так и те заказы, которые были созданы, но по каким-то причинам не были отгружены.
+ 	--неотгруженные заказы (без номер и даты реализации) нам не нужны. Но помимо них, в таблице "DDS".orders_realizations есть еще отчеты комиссионеров. Они также не имеют номера и даты реализации, но они являются отгруженными заказами. Поэтому в таблице они должны присутствовать.
+	--сейчас в витрину добавим отчеты комиссионеров (это 2 клиента)
         INSERT INTO "CDM".all_months_aggregated_sales (client_id, sales_channel, realization_date, item_number, subbrand, brand, count, total_sum)
         SELECT 
 	    or2.client_id,
@@ -91,6 +96,7 @@ def load_monthly_sales_by_brands():
         # load to local to DB (monthly_sales_by_brands)
         cur_1 = conn_1.cursor()
         postgres_insert_query = """ 
+	--из предыдущей витрины мы создадим дополнительную витрину: "Продажи по брендам, по месяцам"
         TRUNCATE "CDM".monthly_sales_by_brands;
         INSERT INTO "CDM".monthly_sales_by_brands (realization_month, brand, total_sum)
         SELECT
@@ -118,6 +124,7 @@ def load_monthly_sales_by_sales_channels():
         # load to local to DB (monthly_sales_by_sales_channels)
         cur_1 = conn_1.cursor()
         postgres_insert_query = """ 
+	--из предыдущей витрины мы создадим дополнительную витрину: "Продажи по каналам (продаж), по месяцам"
         TRUNCATE "CDM".monthly_sales_by_sales_channels;
         INSERT INTO "CDM".monthly_sales_by_sales_channels (realization_month, client, sales_channel, total_sum)
         SELECT
@@ -130,6 +137,12 @@ def load_monthly_sales_by_sales_channels():
         GROUP BY realization_month, c.client, amas.sales_channel
         ORDER BY to_char(amas.realization_date, 'YYYY-MM');
 
+ 	--в данной витрине должны присутствовать отчеты комиссионеров, нам нужно их в нее добавить.
+  	--продажи комиссионеров в 1С у нас появляются не сразу после продажи, а с лагом в месяц - когда комиссионер присылает нам отчет.
+   	--но руководству нужно знать текущие продажи в данном канале, поэтому мы их запрашиваем у менеджеров; те в файле csv нам предоставляют эти данные
+    	--после чего мы загружаем этот файл на STG слой и оттуда забираем в витрину.
+     	--при этом, важно сказать, что частично в 1С по одному комиссионеру мы можем в текущем месяце видеть продажи, но они не полные
+      	--поэтому нам нужно сравнить продажи в monthly_sales_by_sales_channels и в "STG".marketplaces, и оставить в итоговой витрине бОльшую сумму (она актуальнее)
 	with a as(
 	select  
 		distinct m.client,
@@ -142,6 +155,7 @@ def load_monthly_sales_by_sales_channels():
 	FROM a
 	WHERE "CDM".monthly_sales_by_sales_channels.client = a.client and "CDM".monthly_sales_by_sales_channels.realization_month = '2023-09';
 
+	--при этом, продажи остальных комиссионеров мы просто добавляем в итоговую витрину (по условию, что он остсутствует в итоговой витрине)
 	with a as(
 	select  
 		distinct m.client,
@@ -171,6 +185,7 @@ def load_to_current_month_aggregated_sales():
         # load to local to DB (current_month_aggregated_sales)
         cur_1 = conn_1.cursor()
         postgres_insert_query = """ 
+	--создаем витрину продаж текущего месяца. Эта витрина агрегированна по менеджеру, клиенту и бренду. Она нам необходима для создания итогового отчета по продажам, в котором мы будем сравнивать текущие продажи с прогнозом, который выставило руководство и менеджеры
         truncate "CDM".current_month_aggregated_sales ;
         insert into "CDM".current_month_aggregated_sales(manager, client, subbrand, orders_sum, realizations_sum)
         with a as (
@@ -179,7 +194,7 @@ def load_to_current_month_aggregated_sales():
   		or2.realization_number,
 		c.subbrand,
 		case
-		    when or2.realization_number is null or or2.realization_number = '' then sum(or2.total_sum)
+		    when or2.realization_number is null or or2.realization_number = '' then sum(or2.total_sum) --в итоговой витрине мы хотим видеть отдельный столбец по заказам (не отгруженным) и отдельный столбец - по реализациям (отгруженным). Но сумма заказа у нас находится в единственном столбце total_sum, поэтому с помощью конструкции case, мы распределим данные total_sum по отдельным столбцам.
 		    else null
 		end as orders_sum,
 		case
@@ -212,11 +227,13 @@ def load_to_current_month_aggregated_sales():
 	    from b
 	    left join "DDS".managers m on b.manager_id=m.id
 	    ;
+     	--добавляем в витрину данные комиссионеров (сначала сравниваем продажи в "CDM".current_month_aggregated_sales и "STG".marketplaces; выбираем бОльшую сумму продаж комиссионеров, которые присутствуют в "CDM".current_month_aggregated_sales)
         UPDATE "CDM".current_month_aggregated_sales
         SET realizations_sum = GREATEST("CDM".current_month_aggregated_sales.realizations_sum, "STG".marketplaces.total_realizations)
         FROM "STG".marketplaces
         WHERE "CDM".current_month_aggregated_sales.client = "STG".marketplaces.client and "CDM".current_month_aggregated_sales.subbrand = "STG".marketplaces.brand;
-        INSERT INTO "CDM".current_month_aggregated_sales (manager, client, subbrand, realizations_sum)
+        --добавляем в витрину данные продаж комиссионеров из "STG".marketplaces, которых нет в итоговой витрине
+	INSERT INTO "CDM".current_month_aggregated_sales (manager, client, subbrand, realizations_sum)
         SELECT t2.manager, t2.client, t2.brand, t2.total_realizations
         FROM "STG".marketplaces AS t2
         WHERE NOT EXISTS (SELECT 1 FROM "CDM".current_month_aggregated_sales AS t1 WHERE t1.manager = t2.manager and t1.client = t2.client and t1.subbrand = t2.brand);
@@ -238,6 +255,7 @@ def load_to_monthly_sales_report():
         # load to local to DB (monthly_sales_report)
         cur_1 = conn_1.cursor()
         postgres_insert_query = """ 
+	--создаем итоговую витрину "Отчета по продажам"
         truncate "CDM".monthly_sales_report;
         with e as (
 	    select
@@ -254,27 +272,27 @@ def load_to_monthly_sales_report():
         )
         insert into "CDM".monthly_sales_report(manager, client, brand, general_plan, plan_comletion_percent, orders_sum, realizations_sum, total_sum, week_1, week_2, week_3, week_4, week_5, general_forecast, forecast_completion_percent)
         select
-	    e.manager,
-	    e.client,
-	    e.brand,
-	    e.general_plan,
+	    e.manager, --менеджер
+	    e.client, --клиент
+	    e.brand, --бренд
+	    e.general_plan, --план, выставленный руководством
 	    CASE
         WHEN e.general_plan <= 0 THEN 0 -- Handle division by zero or negative revenue
         ELSE (cmas.orders_sum + cmas.realizations_sum) / e.general_plan
-        END AS plan_completion_percent,
-	    cmas.orders_sum,
-	    cmas.realizations_sum,
-	    cmas.orders_sum + cmas.realizations_sum as total_sum,
-	    e.week_1,
-	    e.week_2,
-	    e.week_3,
-	    e.week_4,
-	    e.week_5,
-	    (e.week_1 +	e.week_2 + e.week_3 + e.week_4 + e.week_5) as general_forecast,
+        END AS plan_completion_percent, --выполнение плана, выставленного руководством (относительно текущих продаж)
+	    cmas.orders_sum, --сумма заказов
+	    cmas.realizations_sum, --сумма отгрузок
+	    cmas.orders_sum + cmas.realizations_sum as total_sum, --общая сумма заказов и отгрузок
+	    e.week_1, --план продаж менеджеров на 1 неделю
+	    e.week_2, --план продаж менеджеров на 2 неделю
+	    e.week_3, --план продаж менеджеров на 3 неделю
+	    e.week_4, --план продаж менеджеров на 4 неделю
+	    e.week_5, --план продаж менеджеров на 5 неделю
+	    (e.week_1 +	e.week_2 + e.week_3 + e.week_4 + e.week_5) as general_forecast, - общий прогноз продаж менеджеров на месяц
 	    CASE
         WHEN e.general_plan <= 0 THEN 0 -- Handle division by zero or negative revenue
         ELSE (e.week_1 + e.week_2 + e.week_3 + e.week_4 + e.week_5) / e.general_plan
-        END AS forecast_completion_percent
+        END AS forecast_completion_percent --выполнение плана продаж, выставленного руководством (в сравнении с прогнозом продаж, выставленного менеджерами)
         from e
         left join "CDM".current_month_aggregated_sales cmas on e.manager=cmas.manager and e.client=cmas.client and e.brand=cmas.subbrand
         group by e.manager,
@@ -289,11 +307,12 @@ def load_to_monthly_sales_report():
 	    e.week_4,
 	    e.week_5
         ;
+	--добавляем в витрину "Отчет по продажам" новых менеджеров, клиентов, бренды, которых изначально не было в витрине
         INSERT INTO "CDM".monthly_sales_report (manager, client, brand, orders_sum, realizations_sum)
         SELECT 
 	    t2.manager,
 	    t2.client, 
-	    t2.subbrand, 
+	    t2.subbrand,
 	    t2.orders_sum,
 	    t2.realizations_sum
         FROM "CDM".current_month_aggregated_sales AS t2
