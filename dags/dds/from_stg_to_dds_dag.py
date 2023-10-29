@@ -42,6 +42,9 @@ def load_managers_to_dds():
     # load to local to DB (managers)
     cur_1 = conn_1.cursor()
     postgres_insert_query = """ 
+    --создаем словарь менеджеров, в который инкрементально добавляются новые менеджеры, которые до этого отсутствовали в базе
+    --сначала добавляем менеджеров из старой базы данных (2017-2022 гг.)
+    --уникальные (суррогатные) id менеджеров генерируются автоматически
     INSERT INTO "DDS".managers(manager) 
     SELECT 
       DISTINCT manager 
@@ -56,6 +59,7 @@ def load_managers_to_dds():
         WHERE 
           "DDS".managers.manager = "STG".old_sales.manager
       );
+    --добавляем менеджеров из новой базы данных (2023 г.)  
     INSERT INTO "DDS".managers(manager) 
     SELECT 
       DISTINCT manager 
@@ -83,6 +87,10 @@ def load_clients_to_dds():
     # load to local to DB (clients)
     cur_1 = conn_1.cursor()
     postgres_insert_query = """ 
+    --создаем словарь клиентов, в который инкрементально добавляются новые клиенты, которые до этого отсутствовали в базе
+    --сначала добавляем клиентов из старой базы данных (2017-2022 гг.)
+    --уникальные (суррогатные) id клиентов генерируются автоматически
+    --в словаре помимо id и наименования клиентов присутствуют: уникальные id менеджеров (подтягиваются из словаря managers), канал продаж и регион
     INSERT INTO "DDS".clients(client_id, client, manager_id, sales_channel, region)
     SELECT DISTINCT os.client_id,
         os.client,
@@ -98,6 +106,7 @@ def load_clients_to_dds():
         WHERE "DDS".clients.client_id = os.client_id 
     )
     ;
+    --добавляем клиентов из новой базы данных (2023 г.)
     INSERT INTO "DDS".clients(client_id, client, manager_id, sales_channel, region)
     SELECT DISTINCT s.client_id,
         s.client,
@@ -125,6 +134,8 @@ def load_orders_realizations_to_dds():
     # load to local to DB (orders_realization)
     cur_1 = conn_1.cursor()
     postgres_insert_query = """ 
+        --создаем таблицу показателей продаж;
+	--для начала в исходных данных на STG слое в таблицах old_sales, sales заменяем разделители целой и дробной части в числовых данных с запятой на точку
         UPDATE "STG".sales
     	SET 
     	    price = REPLACE(price, ',', '.'),
@@ -134,31 +145,33 @@ def load_orders_realizations_to_dds():
     	    price = REPLACE(price, ',', '.'),
     	    total_sum = REPLACE(total_sum, ',', '.');
     	TRUNCATE "DDS".orders_realizations;
+     	--добавляем в таблицу данные из "STG".old_sales
         INSERT INTO "DDS".orders_realizations(
-	    client_id, 
-	    order_date, 
-	    order_number, 
-	    realization_date, 
-	    realization_number, 
-	    item_number, 
-	    count, 
-	    price, 
-	    total_sum, 
-	    comment)
+	    client_id, --суррогатный id
+	    order_date, --дата заказа
+	    order_number, --номер заказа
+	    realization_date, --дата отгрузки
+	    realization_number, --номер отгрузки
+	    item_number, --артикул товара
+	    count, --количество
+	    price, --цена в заказе
+	    total_sum, -сумма заказа
+	    comment) --комментарий к заказу
     	    SELECT  
     	        c.id as client_id, 
-    		to_date(os.order_date, 'DD-MM-YYYY'), 
+    		to_date(os.order_date, 'DD-MM-YYYY'), --в исходных данных слоя STG все данные типа varchar; на данном этапе мы переводим эти данные в корректные - date
     		os.order_number, 
-    		to_date(os.realization_date, 'DD-MM-YYYY'), 
+    		to_date(os.realization_date, 'DD-MM-YYYY'), --в исходных данных слоя STG все данные типа varchar; на данном этапе мы переводим эти данные в корректные - date
     		os.realization_number, 
     		os.item_number, 
     		os.count, 
-    		cast(os.price as double precision),
-            	cast(os.total_sum as double precision),
+    		cast(os.price as double precision), --в исходных данных слоя STG все данные типа varchar; на данном этапе мы переводим эти данные в корректные - numeric
+            	cast(os.total_sum as double precision), --в исходных данных слоя STG все данные типа varchar; на данном этапе мы переводим эти данные в корректные - numeric
     		os.comment  
 	    FROM "STG".old_sales as os
 	    left join "DDS".clients as c using(client_id)	    
         ;
+	--добавляем в таблицу актуальные данные из "STG".sales
         INSERT INTO "DDS".orders_realizations(
 	    client_id, 
 	    order_date, 
@@ -172,14 +185,14 @@ def load_orders_realizations_to_dds():
 	    comment)
     	    SELECT 
     		c.id as client_id, 
-    		to_date(s.order_date, 'DD-MM-YYYY'), 
+    		to_date(s.order_date, 'DD-MM-YYYY'), --в исходных данных слоя STG все данные типа varchar; на данном этапе мы переводим эти данные в корректные - date
     		s.order_number, 
-    		to_date(s.realization_date, 'DD-MM-YYYY'), 
+    		to_date(s.realization_date, 'DD-MM-YYYY'), --в исходных данных слоя STG все данные типа varchar; на данном этапе мы переводим эти данные в корректные - date
     		s.realization_number, 
     		s.item_number, 
     		s.count, 
-    		cast(s.price as double precision),
-            	cast(s.total_sum as double precision),
+    		cast(s.price as double precision), --в исходных данных слоя STG все данные типа varchar; на данном этапе мы переводим эти данные в корректные - numeric
+            	cast(s.total_sum as double precision), --в исходных данных слоя STG все данные типа varchar; на данном этапе мы переводим эти данные в корректные - numeric
     		s.comment  
 	    FROM "STG".sales as s
 	    left join "DDS".clients as c using(client_id)	    
