@@ -1,6 +1,7 @@
 import os
 
 def find_the_latest_local_file_by_name(folder:str) -> str:
+    """Сканируем папку и находим самый новый файл в ней (по имени)"""
     file_list = os.listdir(os.path.join('/', 'opt', 'airflow', 'plugins', 'files_dir', folder))
     latest_file = sorted(file_list, reverse=True)
     if len(latest_file) == 0:

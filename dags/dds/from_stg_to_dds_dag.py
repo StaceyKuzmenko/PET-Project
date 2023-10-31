@@ -13,12 +13,6 @@ from airflow.hooks.base import BaseHook
 # init connection
 # Connect to your local postgres DB (Docker)
 
-# DB_NAME = "project_db"
-# DB_USER = "project_user"
-# DB_PASS = "project_password"
-# DB_HOST = "91.107.126.62"
-# DB_PORT = "5433"
-
 conn = BaseHook.get_connection('postgres_db_conn')
 
 DB_NAME = conn.schema
