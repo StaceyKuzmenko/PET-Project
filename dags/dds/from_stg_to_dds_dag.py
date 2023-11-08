@@ -149,7 +149,7 @@ def load_orders_realizations_to_dds():
 	    item_number, --артикул товара
 	    count, --количество
 	    price, --цена в заказе
-	    total_sum, -сумма заказа
+	    total_sum, --сумма заказа
 	    comment) --комментарий к заказу
     	    SELECT  
     	        c.id as client_id, 
