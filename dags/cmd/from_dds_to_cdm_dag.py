@@ -27,7 +27,7 @@ with DAG(
         'from_dds_to_cdm_dag',                  
         default_args=default_args,         
         schedule_interval='20 4,9,13 * * *',  
-        template_searchpath="/opt/compose/dags/sql/"
+        template_searchpath="/opt/compose/dags/sql/",
         start_date=datetime(2023, 10, 16),  
         catchup=False,                     
         tags=['Pet-Project', 'dds', 'cdm'],
