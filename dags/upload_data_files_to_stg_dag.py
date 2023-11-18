@@ -9,6 +9,9 @@ from airflow.utils.task_group import TaskGroup
 conn = BaseHook.get_connection('ftp_conn')
 folders = ('forecast', 'category', 'sales', 'marketplaces')
 
+SQL_CLEAR_TABLES_PATH = "sql/stg_clearing_tables.sql"
+COPY_FORMAT = "format csv, delimiter \";\", header"
+
 args = {
     "owner": "PET",
     'email': ['pet@pet.com'],
@@ -32,20 +35,19 @@ with DAG(
     clear_stg_tables = PostgresOperator(
         task_id="stg_clearing_tables",
         postgres_conn_id="postgres_local",
-        sql="sql/stg_clearing_tables.sql"
+        sql=SQL_CLEAR_TABLES_PATH
 )
 
     loading_sql_tasks = TaskGroup('load_files_to_stg')
-    
 
     with loading_sql_tasks:
-        for folder in folders:
-            latest_file = find_the_latest_local_file_by_name(folder)
+        file_tasks = [
             PostgresOperator(
-            task_id=f"stg_loading_table_{folder}",
-            postgres_conn_id="postgres_local",
-            sql=f"copy \"STG\".{folder} from '{latest_file}' with (format csv, delimiter \";\", header);"
-            )
+                task_id=f"stg_loading_table_{folder}",
+                postgres_conn_id="postgres_local",
+                sql=f"copy \"STG\".{folder} from '{find_the_latest_local_file_by_name(folder)}' with ({COPY_FORMAT});"
+            ) for folder in folders
+        ]
 
 
 (
