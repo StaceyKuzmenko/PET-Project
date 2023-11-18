@@ -35,7 +35,7 @@ with DAG(
     # create DAG logic (sequence/order)
     
     def get_sql_file_path(script_name):
-        sql_script_directory = "dags/sql"
+        sql_script_directory = "sql"
         return f"{sql_script_directory}/{script_name}.sql"
     
     t10 = PostgresOperator(task_id="all_months_to", postgres_conn_id="postgres_local", sql=get_sql_file_path("cdm_load_all_months_aggregated_sales"), autocommit=True, dag=dag,)
