@@ -27,7 +27,7 @@ execution_times = ["20 4", "20 9", "20 13"] # <<< this is in UTC (in UTC +3 07:2
 with DAG(
         'from_dds_to_cdm_dag',                  
         default_args=default_args,         
-        schedule_interval='20 4,9,13 * * *',  
+        schedule_interval='20 4,9,13 * * *',
         start_date=datetime(2023, 10, 16),  
         catchup=False,                     
         tags=['Pet-Project', 'dds', 'cdm'],
