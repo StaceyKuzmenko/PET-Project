@@ -7,12 +7,12 @@ from airflow import DAG
 from airflow.decorators import dag, task
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python import PythonOperator
-# from airflow.hooks.base import BaseHook
+from airflow.hooks.base import BaseHook
 
 ### POSTGRESQL settings ###
 # init connection
 # Connect to your local postgres DB (Docker)
-# conn = BaseHook.get_connection('postgres_local')
+conn = BaseHook.get_connection('postgres_local')
 
 DB_NAME = conn.schema
 DB_USER = conn.login
