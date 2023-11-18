@@ -4,9 +4,11 @@ from library.ftp_download import get_files_from_ftp
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.hooks.base import BaseHook
+from airflow.models import Variable
 
+#folders = ('forecast', 'category', 'sales', 'marketplaces')
+folders = Variable.get('folders_list')
 conn = BaseHook.get_connection('ftp_conn')
-folders = ('forecast', 'category', 'sales', 'marketplaces')
 
 args = {
     "owner": "PET",
