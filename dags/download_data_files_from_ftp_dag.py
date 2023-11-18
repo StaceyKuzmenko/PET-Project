@@ -7,7 +7,8 @@ from airflow.hooks.base import BaseHook
 from airflow.models import Variable
 
 #folders = ('forecast', 'category', 'sales', 'marketplaces')
-folders = Variable.get('folders_list', deserialize_json = True)
+folders_list = Variable.get('folders_list', deserialize_json = True)
+folders = folders_list[value]
 print("*************************************", folders)
 conn = BaseHook.get_connection('ftp_conn')
 
