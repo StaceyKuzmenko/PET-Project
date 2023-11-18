@@ -39,11 +39,11 @@ with DAG(
         sql_script_directory = "dags/sql"
         return f"{sql_script_directory}/{script_name}.sql"
     
-    t10 = SqlFileOperator(task_id="all_months_to", postgres_conn_id="postgres_local", sql=get_sql_file_path("cdm_load_all_months_aggregated_sales"), autocommit=True, dag=dag,)
-    t11 = SqlFileOperator(task_id="brands_to", postgres_conn_id="postgres_local", sql=get_sql_file_path("cdm_load_monthly_sales_by_brands"), autocommit=True, dag=dag,)
-    t12 = SqlFileOperator(task_id="channels_to", postgres_conn_id="postgres_local", sql=get_sql_file_path("cdm_load_monthly_sales_by_sales_channels"), autocommit=True, dag=dag,)
-    t13 = SqlFileOperator(task_id="aggregates_sales_to", postgres_conn_id="postgres_local", sql=get_sql_file_path("cdm_load_to_current_month_aggregated_sales"), autocommit=True, dag=dag,)
-    t14 = SqlFileOperator(task_id="forecast_to", postgres_conn_id="postgres_local", sql=get_sql_file_path("cdm_load_to_monthly_sales_report"), autocommit=True, dag=dag,)
+    t10 = PostgresOperator(task_id="all_months_to", postgres_conn_id="postgres_local", sql=get_sql_file_path("cdm_load_all_months_aggregated_sales"), autocommit=True, dag=dag,)
+    t11 = PostgresOperator(task_id="brands_to", postgres_conn_id="postgres_local", sql=get_sql_file_path("cdm_load_monthly_sales_by_brands"), autocommit=True, dag=dag,)
+    t12 = PostgresOperator(task_id="channels_to", postgres_conn_id="postgres_local", sql=get_sql_file_path("cdm_load_monthly_sales_by_sales_channels"), autocommit=True, dag=dag,)
+    t13 = PostgresOperator(task_id="aggregates_sales_to", postgres_conn_id="postgres_local", sql=get_sql_file_path("cdm_load_to_current_month_aggregated_sales"), autocommit=True, dag=dag,)
+    t14 = PostgresOperator(task_id="forecast_to", postgres_conn_id="postgres_local", sql=get_sql_file_path("cdm_load_to_monthly_sales_report"), autocommit=True, dag=dag,)
 
     t1 = DummyOperator(task_id="start")
     t2 = DummyOperator(task_id="end")
