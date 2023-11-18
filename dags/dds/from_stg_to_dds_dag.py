@@ -13,14 +13,13 @@ from airflow.hooks.base import BaseHook
 # init connection
 # Connect to your local postgres DB (Docker)
 
-conn = BaseHook.get_connection('postgres_db_conn')
+conn = BaseHook.get_connection('postgres_local')
 
 DB_NAME = conn.schema
 DB_USER = conn.login
 DB_PASS = conn.password
 DB_HOST = conn.host
 DB_PORT = conn.port
-
 
 conn_1 = psycopg2.connect(
     database=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port=DB_PORT
