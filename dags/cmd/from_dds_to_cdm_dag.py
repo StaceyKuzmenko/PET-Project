@@ -34,7 +34,7 @@ with DAG(
 
     # create DAG logic (sequence/order)
     t1 = DummyOperator(task_id="start")
-    t10 = PostgresOperator(task_id="all_months_to", postgres_conn_id="postgres_local", sql="./sql/cdm_load_all_months_aggregated_sales.sql")
+    t10 = PostgresOperator(task_id="all_months_to", postgres_conn_id="postgres_local", sql="../sql/cdm_load_all_months_aggregated_sales.sql")
     t11 = PostgresOperator(task_id="brands_to", postgres_conn_id="postgres_local", sql="dags/sql/cdm_load_monthly_sales_by_brands.sql")
     t12 = PostgresOperator(task_id="channels_to", postgres_conn_id="postgres_local", sql="dags/sql/cdm_load_monthly_sales_by_sales_channels.sql")
     t13 = PostgresOperator(task_id="aggregates_sales_to", postgres_conn_id="postgres_local", sql="dags/sql/cdm_load_to_current_month_aggregated_sales.sql")
