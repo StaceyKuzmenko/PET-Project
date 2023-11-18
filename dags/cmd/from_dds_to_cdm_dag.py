@@ -13,6 +13,7 @@ from airflow.hooks.base import BaseHook
 ### POSTGRESQL settings ###
 # init connection
 # Connect to your local postgres DB (Docker)
+
 conn = BaseHook.get_connection('postgres_local')
 
 default_args = {
