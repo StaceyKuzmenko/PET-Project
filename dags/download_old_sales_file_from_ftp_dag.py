@@ -5,9 +5,12 @@ from library.managing_files import find_the_latest_local_file_by_name
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.hooks.base import BaseHook
+from airflow.models import Variable
 
+folders_list = Variable.get('old_folders', deserialize_json = True)
+folders = folders_list['value']
 conn = BaseHook.get_connection('ftp_conn')
-folders = ('old_sales',)
+#folders = ('old_sales',)
 
 args = {
     "owner": "PET",
