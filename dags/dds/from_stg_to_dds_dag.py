@@ -39,7 +39,7 @@ with DAG(
     t1 = DummyOperator(task_id="start")
     t11 = PostgresOperator(task_id="managers", postgres_conn_id="postgres_local", sql=get_sql_file_path("dds_load_managers_to_dds"), autocommit=True, dag=dag)
     t12 = PostgresOperator(task_id="clients", postgres_conn_id="postgres_local", sql=get_sql_file_path("dds_load_clients_to_dds"), autocommit=True, dag=dag)
-    t13 = PostgresOperator(task_id="orders_realizations", postgres_conn_id="postgres_local", sql=get_sql_file_path("dds_load_orders_realization_to_dds"), autocommit=True, dag=dag)
+    t13 = PostgresOperator(task_id="orders_realizations", postgres_conn_id="postgres_local", sql=get_sql_file_path("dds_load_orders_realizations_to_dds"), autocommit=True, dag=dag)
     t2 = DummyOperator(task_id="end")
 
     '''for time in execution_times:
