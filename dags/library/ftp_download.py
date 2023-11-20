@@ -37,7 +37,7 @@ def get_files_from_ftp(folder_list:list, host, user:str, passwd:str):
                 latest_time = modified_time
             
             #для отладки печатаем имя файла
-            print ('found date >>>', datetime.strptime(modified_time[4:], "%Y%m%d%H%M%S").strftime("%d %B %Y %H:%M:%S"))
+            logger.debug('found date >>>', datetime.strptime(modified_time[4:], "%Y%m%d%H%M%S").strftime("%d %B %Y %H:%M:%S"))
 
         #создаем новое имя для файла в формате ггггммдд
         new_file_name = f'{folder}-{latest_time[4:]}.csv'
