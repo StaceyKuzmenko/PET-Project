@@ -18,6 +18,7 @@ def get_files_from_ftp(folder_list:list, host, user:str, passwd:str):
     
     #проходим поочередно каждую папку из списка folder_list
         for folder in folder_list:
+            local_folder = os.path.join('/', 'opt', 'airflow', 'plugins', 'files_dir', folder)
             latest_time = None
             latest_name = None
             logger.debug('FTP path: ', os.path.join('Engeocom', 'test', folder))
@@ -30,6 +31,7 @@ def get_files_from_ftp(folder_list:list, host, user:str, passwd:str):
 
             #поочередно проходим по всему списку файлов
             for file in filelist:
+                
                 #получаем время последней модификации файла (в нашем случае оно совпадает с датой создания файла)    
                 modified_time = ftp.sendcmd('MDTM ' + file)
                 
@@ -44,8 +46,12 @@ def get_files_from_ftp(folder_list:list, host, user:str, passwd:str):
             #создаем новое имя для файла в формате ггггммдд
             new_file_name = f'{folder}-{latest_time[4:]}.csv'
             
+            #проверяем есть ли необходимая папка в локальной дериктории, если нет - то создаем её
+            if not os.path.isdir(local_folder):
+                os.makedirs(local_folder)
+
             #копируем файл в локальную папку
-            file_name_with_full_path_to_local_folder = os.path.join('/', 'opt', 'airflow', 'plugins', 'files_dir', folder, new_file_name)
+            file_name_with_full_path_to_local_folder = local_folder + '/' + new_file_name
             with open(file_name_with_full_path_to_local_folder, 'wb') as f:
                 ftp.retrbinary('RETR '+ latest_name, f.write)
         
