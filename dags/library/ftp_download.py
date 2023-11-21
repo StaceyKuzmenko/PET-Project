@@ -40,7 +40,7 @@ def get_files_from_ftp(folder_list:list, host, user:str, passwd:str):
                     latest_name = file
                     latest_time = modified_time
                 
-                #для отладки печатаем имя файла
+                #для отладки
                 logger.debug('found date >>>', datetime.strptime(modified_time[4:], "%Y%m%d%H%M%S").strftime("%d %B %Y %H:%M:%S"))
 
             #создаем новое имя для файла в формате ггггммдд
